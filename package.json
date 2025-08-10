@@ -4,7 +4,9 @@
     "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/bot.ts"
   },
   "dependencies": {
+    "@discordjs/rest": "^2.5.1",
     "@types/node": "^24.2.1",
+    "discord-events.js": "^1.0.2",
     "discord.js": "^14.21.0",
     "dotenv": "^17.2.1",
     "fs": "0.0.1-security",

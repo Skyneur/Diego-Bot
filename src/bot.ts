@@ -1,19 +1,29 @@
 import dotenv from "dotenv";
 dotenv.config();
-import { Client, IntentsBitField, Collection } from "discord.js";
-import config from "./config";
-import { Console } from "./utils/console/namespace";
+const events = require("discord-events.js");
+import { handleEvents } from "./handlers/events";
+import { Client, Collection } from "discord.js";
 import { _T } from "./utils/translator";
+import config from "@src/config";
+import { Console } from "@src/utils/console/namespace";
+import { handleCommands } from "./handlers/commands";
+
+declare module "discord.js" {
+  export interface Client {
+    commands: Collection<string, any>;
+  }
+}
 
 const bot = new Client({ intents: [3276799] });
+bot.commands = new Collection();
 
-bot.login(process.env.TOKEN).then(() => {
-  console.clear();
+bot.login(process.env.TOKEN).then(async () => {
+  handleEvents(bot);
+  handleCommands(bot);
   bot.user?.setPresence({
     activities: config.activities,
     status: config.status,
   });
-
   const intentsBitfield = bot.options.intents.bitfield;
   const intentsCount = intentsBitfield.toString(2).replace(/0/g, "").length;
 
