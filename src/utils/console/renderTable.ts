@@ -11,107 +11,117 @@ function renderTable({
   rows,
   comment = "",
 }: TableOptions): void {
-  const colWidths = headers.map((header, i) => {
-    return Math.max(
-      stripAnsi(header).length,
-      ...rows.map((row) => (row[i] ? stripAnsi(row[i].toString()).length : 0))
-    );
-  });
+  const targetWidth = 57;
+  const numCols = headers.length;
 
-  let fullWidth = colWidths.reduce((a, b) => a + b, 0) + headers.length * 3 + 1;
+  // Calcul de la largeur par colonne (équitable)
+  const availableWidth = targetWidth - (numCols + 1);
+  const baseColWidth = Math.floor(availableWidth / numCols);
+  const extraChars = availableWidth % numCols;
 
-  if (comment) {
-    const commentLength = stripAnsi(comment).length + 2;
-    if (commentLength + 2 > fullWidth) {
-      const extra = commentLength + 2 - fullWidth;
-      colWidths[colWidths.length - 1] += extra;
-      fullWidth = commentLength + 2;
-    }
-  }
+  const colWidths = headers.map(
+    (_, i) => baseColWidth + (i < extraChars ? 1 : 0)
+  );
 
-  if (fullWidth < 60) {
-    const extra = 60 - fullWidth;
-    colWidths[colWidths.length - 1] += extra;
-    fullWidth = 60;
-  }
+  let fullWidth = colWidths.reduce((a, b) => a + b, 0) + headers.length + 1;
 
   // ---- Ligne titre ----
   const titleDisplay = ` ${title.toUpperCase()} `;
-  const remaining = fullWidth - titleDisplay.length - 2;
+  const remaining = fullWidth - titleDisplay.length;
   console.log(
     formatConsole(
-      `${color}${chars[0]}${chars[1].repeat(2)}${titleDisplay}${chars[1].repeat(
-        remaining
-      )}${chars[2]}`
+      color +
+        chars[0] +
+        chars[1].repeat(2) +
+        titleDisplay +
+        chars[1].repeat(remaining) +
+        chars[2]
     )
   );
 
   // ---- Commentaire ----
   if (comment) {
-    const paddedComment = ` ${comment}${" ".repeat(
-      fullWidth - comment.length - 3
+    const commentClean = stripAnsi(formatConsole(comment));
+    const paddedComment = ` ${comment}^R${" ".repeat(
+      fullWidth - commentClean.length + 1
     )}`;
     console.log(
-      formatConsole(`${color}${chars[5]}${paddedComment}${chars[5]}`)
+      formatConsole(color + chars[5]) +
+        formatConsole("^R" + paddedComment) +
+        formatConsole(color + chars[5])
     );
   }
 
   // ---- Ligne séparateur haut colonnes ----
   console.log(
-    horizontalLine(colWidths, color, chars[6], chars[1], chars[8], chars[7])
+    formatConsole(
+      color +
+        chars[6] +
+        colWidths.map((w) => chars[1].repeat(w + 2)).join(chars[8]) +
+        chars[7]
+    )
   );
 
+  // Fonction pour centrer le texte dans une colonne
+  const centerText = (text: string, width: number): string => {
+    const cleanText = stripAnsi(formatConsole(text));
+    const padding = width - cleanText.length;
+    const leftPad = Math.floor(padding / 2);
+    const rightPad = padding - leftPad;
+    return " ^R".repeat(leftPad) + text + "^R ".repeat(rightPad);
+  };
+
   // ---- Headers ----
-  const headerLine =
-    color +
-    chars[5] +
-    headers
-      .map((h, i) => {
-        const content = stripAnsi(h).padEnd(colWidths[i]);
-        return ` ${content} `;
-      })
-      .join(chars[5]) +
-    chars[5];
-  console.log(formatConsole(headerLine));
+  let headerContent = "";
+  headers.forEach((h, i) => {
+    const centeredHeader = centerText(h, colWidths[i]);
+    headerContent += ` ${centeredHeader} `;
+    if (i < headers.length - 1) {
+      headerContent += formatConsole(color + chars[5]) + formatConsole("^R");
+    }
+  });
+  console.log(
+    formatConsole(color + chars[5]) +
+      formatConsole("^R" + headerContent) +
+      formatConsole(color + chars[5])
+  );
 
   // ---- Ligne séparateur entête / données ----
   console.log(
-    horizontalLine(colWidths, color, chars[6], chars[1], chars[10], chars[7])
+    formatConsole(
+      color +
+        chars[6] +
+        colWidths.map((w) => chars[1].repeat(w + 2)).join(chars[10]) +
+        chars[7]
+    )
   );
 
   // ---- Lignes de données ----
   rows.forEach((row) => {
-    const rowLine =
-      color +
-      chars[5] +
-      row
-        .map((cell, i) => {
-          const text = cell?.toString() ?? "";
-          const clean = stripAnsi(text);
-          return ` ${text}${" ".repeat(colWidths[i] - clean.length + 1)}`;
-        })
-        .join(chars[5]) +
-      chars[5];
-    console.log(formatConsole(rowLine));
+    let rowContent = "";
+    row.forEach((cell, i) => {
+      const text = cell?.toString() ?? "";
+      const centeredText = centerText(text, colWidths[i]);
+      rowContent += ` ${centeredText} `;
+      if (i < row.length - 1) {
+        rowContent += formatConsole(color + chars[5]) + formatConsole("^R");
+      }
+    });
+    console.log(
+      formatConsole(color + chars[5]) +
+        formatConsole("^R" + rowContent) +
+        formatConsole(color + chars[5])
+    );
   });
 
   // ---- Ligne de fin ----
   console.log(
-    horizontalLine(colWidths, color, chars[4], chars[1], chars[9], chars[3])
-  );
-}
-
-// Génère une ligne horizontale (haut, séparateur, bas)
-function horizontalLine(
-  colWidths: number[],
-  color: string,
-  left: string,
-  fill: string,
-  middle: string,
-  right: string
-): string {
-  return formatConsole(
-    color + left + colWidths.map((w) => fill.repeat(w + 2)).join(middle) + right
+    formatConsole(
+      color +
+        chars[4] +
+        colWidths.map((w) => chars[1].repeat(w + 2)).join(chars[9]) +
+        chars[3]
+    )
   );
 }
 
