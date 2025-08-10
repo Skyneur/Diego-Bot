@@ -1,0 +1,1 @@
+export type IconType = "success" | "error" | "warning" | "info" | "default";
