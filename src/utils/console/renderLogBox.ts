@@ -1,4 +1,5 @@
 // utils/logBox.ts
+import colors from '@src/constants/consoleFormats'
 import formatConsole from "./consoleFormatter";
 import stripAnsi from "./stripAnsi";
 import type { IconType } from "@mytypes/iconType";
@@ -20,7 +21,7 @@ const ICONS: Record<IconType, LogIcon> = {
  * Affiche un encadré de log stylisé
  */
 export function renderLogBox(
-  colorCode: string,
+  colorCode: keyof typeof colors,
   title: string,
   args: LogBoxLine[] = []
 ): void {
@@ -35,8 +36,8 @@ export function renderLogBox(
       ...lines.map((l) => stripAnsi(l).length)
     ) + 1;
 
-  if (maxWidth < 57) {
-    maxWidth = 57;
+  if (maxWidth < 58) {
+    maxWidth = 58;
   }
 
   // Affiche la ligne du haut
