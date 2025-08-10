@@ -2,5 +2,14 @@
   "login": "Login",
   "login_success": "Connected as: ^r{tag}",
   "date": "Date: ^y{date}",
-  "intents_count": "Intents count: ^y{count}"
+  "intents_count": "Intents count: ^y{count}",
+  "invalid_event": "{file} is not a valid event !",
+  "loaded": "Loaded",
+  "events": "Events",
+  "name": "Name",
+  "status": "Status",
+  "found_events": "Found events: ^r{count}",
+  "invalid_command": "{file} is not a valid command !",
+  "found_commands": "Found commands: ^c{count}",
+  "commands": "Commands"
 }

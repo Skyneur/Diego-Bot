@@ -3,6 +3,7 @@ import type { Config } from "@mytypes/config";
 
 const config: Config = {
   language: "en",
+  prefix: "$",
   status: "dnd",
   activities: [
     {
