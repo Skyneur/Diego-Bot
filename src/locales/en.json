@@ -1,0 +1,6 @@
+{
+  "login": "Login",
+  "login_success": "Connected as: ^r{tag}",
+  "date": "Date: ^y{date}",
+  "intents_count": "Intents count: ^y{count}"
+}
