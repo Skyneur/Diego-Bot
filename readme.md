@@ -1,6 +1,6 @@
-# 🤖 Discord Bot TypeScript
+# 🤖 Discord Bot TypeScript Template
 
-Un bot Discord moderne et modulaire développé en TypeScript avec une architecture propre et extensible.
+Un template moderne et modulaire pour développer des bots Discord en TypeScript avec une architecture propre et extensible.
 
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![Discord.js](https://img.shields.io/badge/Discord.js-5865F2?style=for-the-badge&logo=discord&logoColor=white)
@@ -9,14 +9,15 @@ Un bot Discord moderne et modulaire développé en TypeScript avec une architect
 
 ## ✨ Fonctionnalités
 
-- 🏗️ **Architecture modulaire** - Système de commandes et d'événements facilement extensible
-- 🌐 **Support multilingue** - Système de traduction intégré
-- 🎨 **Console stylisée** - Logs colorés et formatés avec des tableaux et encadrés
-- ⚡ **Hot reload** - Rechargement automatique pendant le développement
-- 🔧 **TypeScript** - Type safety et IntelliSense
-- 📦 **Handlers automatiques** - Chargement automatique des commandes et événements
-- 🛡️ **Gestion des permissions** - Support complet des permissions Discord
-- 🎯 **Commandes Slash** - Support natif des commandes slash et des menus contextuels
+- 🏗️ **Architecture modulaire** - Template avec système de commandes et d'événements facilement extensible
+- 🌐 **Support multilingue** - Système de traduction intégré et configurable
+- 🎨 **Console stylisée** - Système de logs colorés et formatés avec tableaux et encadrés
+- ⚡ **Hot reload** - Configuration prête pour le développement avec rechargement automatique
+- 🔧 **TypeScript** - Template entièrement typé avec IntelliSense complet
+- 📦 **Handlers automatiques** - Système de chargement automatique des commandes et événements
+- 🛡️ **Gestion des permissions** - Support complet et prêt à l'emploi des permissions Discord
+- 🎯 **Multi-types de commandes** - Support natif des commandes préfixées, slash et menus contextuels
+- 🚀 **Prêt à l'emploi** - Configuration minimale requise pour démarrer votre projet
 
 ## 🚀 Installation
 
@@ -29,14 +30,12 @@ Un bot Discord moderne et modulaire développé en TypeScript avec une architect
 ### Configuration
 
 1. **Clonez le repository**
-
    ```bash
    git clone https://github.com/Soren-git/discord-bot-typescript.git
    cd discord-bot-typescript
    ```
 
 2. **Installez les dépendances**
-
    ```bash
    pnpm install
    # ou
@@ -44,28 +43,24 @@ Un bot Discord moderne et modulaire développé en TypeScript avec une architect
    ```
 
 3. **Configurez l'environnement**
-
    ```bash
    cp .env.example .env
    ```
-
+   
    Éditez le fichier `.env` et ajoutez votre token :
-
    ```env
    TOKEN=votre_token_discord_ici
    ```
 
 4. **Configurez le bot**
-
+   
    Modifiez `src/config.ts` selon vos besoins :
-
    ```typescript
    const config: Config = {
-     language: "en", // Langue du bot
-     prefix: "$", // Préfixe des commandes
-     status: "dnd", // Statut du bot
-     activities: [
-       // Activités du bot
+     language: "en",        // Langue du bot
+     prefix: "$",           // Préfixe des commandes
+     status: "dnd",         // Statut du bot
+     activities: [          // Activités du bot
        {
          name: ".gg/zproject",
          type: ActivityType.Custom,
@@ -74,9 +69,9 @@ Un bot Discord moderne et modulaire développé en TypeScript avec une architect
    };
    ```
 
-## 🎮 Utilisation
+## 🎮 Développement
 
-### Développement
+### Mode développement
 
 ```bash
 pnpm dev
@@ -84,23 +79,27 @@ pnpm dev
 npm run dev
 ```
 
-### Production
+### Build et production
 
 ```bash
-# Compilation
+# Compilation TypeScript
 pnpm build
 # ou
 npm run build
 
-# Démarrage
+# Démarrage en production
 node dist/bot.js
 ```
+
+### Structure de développement
+
+Le template est conçu pour être facilement extensible. Ajoutez simplement vos fichiers dans les dossiers appropriés et ils seront automatiquement chargés !
 
 ## 📁 Structure du projet
 
 ```
 src/
-├── commands/          # Commandes du bot
+├── commands/           # Commandes du bot
 │   └── ping.ts        # Exemple de commande
 ├── events/            # Événements Discord
 │   └── message-create.ts
@@ -115,7 +114,7 @@ src/
 │   └── translator.ts  # Système de traduction
 ├── constants/         # Constantes
 ├── config.ts          # Configuration du bot
-└── bot.ts             # Point d'entrée
+└── bot.ts            # Point d'entrée
 ```
 
 ## 🛠️ Ajouter des commandes
@@ -160,8 +159,8 @@ const command = new Command<[Client, CommandInteraction]>(
       name: "user",
       description: "User to greet",
       required: true,
-      choices: [],
-    },
+      choices: []
+    }
   ],
   async (client, interaction) => {
     const user = interaction.options.getUser("user");
@@ -176,11 +175,7 @@ export default command;
 
 ```typescript
 import { Command } from "@src/handlers/commands";
-import {
-  Client,
-  ContextMenuCommandInteraction,
-  ContextMenuCommandType,
-} from "discord.js";
+import { Client, ContextMenuCommandInteraction, ContextMenuCommandType } from "discord.js";
 
 const command = new Command<[Client, ContextMenuCommandInteraction]>(
   "context",
@@ -198,7 +193,7 @@ const command = new Command<[Client, ContextMenuCommandInteraction]>(
 export default command;
 ```
 
-## 📝 Ajouter des événements
+## 📝 Créer vos propres événements
 
 Créez un fichier dans `src/events/` :
 
@@ -210,7 +205,7 @@ const event = new Event<[Client, GuildMember]>(
   "guildMemberAdd",
   async (client, member) => {
     console.log(`${member.user.tag} joined ${member.guild.name}`);
-    // Logique de bienvenue
+    // Votre logique de bienvenue ici
   }
 );
 
@@ -230,10 +225,9 @@ export default event;
    }
    ```
 3. Utilisez dans votre code :
-
    ```typescript
    import { _T } from "@src/utils/translator";
-
+   
    const message = _T("welcome", { username: "John" });
    ```
 
@@ -247,7 +241,7 @@ import { Console } from "@src/utils/console/namespace";
 // Encadré avec icônes
 Console.box("^g", "Success", [
   { type: "success", content: "Operation completed!" },
-  { type: "info", content: "Details: ^y42^R files processed" },
+  { type: "info", content: "Details: ^y42^R files processed" }
 ]);
 
 // Tableau formaté
@@ -255,13 +249,16 @@ Console.table({
   color: "^b",
   title: "Statistics",
   headers: ["Name", "Count"],
-  rows: [
-    ["Users", 150],
-    ["Servers", 5],
-  ],
-  comment: "Updated every hour",
+  rows: [["Users", 150], ["Servers", 5]],
+  comment: "Updated every hour"
 });
 ```
+
+### Codes de couleur disponibles
+
+- `^r` Rouge, `^g` Vert, `^b` Bleu, `^y` Jaune
+- `^c` Cyan, `^m` Magenta, `^w` Blanc, `^0` Noir
+- `^B` Gras, `^U` Souligné, `^R` Reset
 
 ## 🔧 Configuration avancée
 
@@ -276,7 +273,7 @@ const command = new Command(
   "slash",
   "admin",
   "Admin command",
-  PermissionFlagsBits.Administrator // Seuls les admins peuvent utiliser
+  PermissionFlagsBits.Administrator, // Seuls les admins peuvent utiliser
   // ...
 );
 ```
@@ -284,19 +281,27 @@ const command = new Command(
 ### Intents
 
 Le bot utilise les intents suivants (configurés dans `bot.ts`) :
-
 - Guilds
 - Guild Messages
 - Message Content
 - Et autres selon vos besoins
 
-## 📊 Scripts disponibles
+## 📊 Scripts et commandes
 
-| Script             | Description                                   |
-| ------------------ | --------------------------------------------- |
-| `pnpm dev`         | Démarre en mode développement avec hot reload |
-| `pnpm build`       | Compile le TypeScript en JavaScript           |
-| `node dist/bot.js` | Démarre le bot compilé                        |
+| Script | Description |
+|--------|-------------|
+| `pnpm dev` / `npm run dev` | Démarre en mode développement avec hot reload |
+| `pnpm build` / `npm run build` | Compile le TypeScript vers JavaScript |
+| `node dist/bot.js` | Démarre le bot compilé en production |
+
+## 🚀 Déploiement
+
+### Préparation pour la production
+
+1. Compilez le projet : `pnpm build`
+2. Configurez vos variables d'environnement
+3. Utilisez `node dist/bot.js` pour démarrer
+4. Considérez un process manager comme PM2
 
 ## 📄 Licence
 
@@ -307,12 +312,33 @@ Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de 
 - 💬 Discord: [Rejoignez notre serveur](https://discord.gg/zproject)
 - 🐛 Issues: [GitHub Issues](https://github.com/Soren-git/discord-bot-typescript/issues)
 
-## 🙏 Remerciements
+## 🙏 Remerciements et crédits
 
-- [Discord.js](https://discord.js.org/) - Bibliothèque Discord pour Node.js
-- [TypeScript](https://www.typescriptlang.org/) - JavaScript avec types statiques
-- La communauté Discord.js pour l'aide et les ressources
+Un grand merci à tous ceux qui rendent ce template possible :
+
+- **[Discord.js](https://discord.js.org/)** - La meilleure bibliothèque Discord pour Node.js
+- **[TypeScript](https://www.typescriptlang.org/)** - JavaScript avec types statiques
+- **La communauté Discord.js** - Pour l'aide, les ressources et l'inspiration
+- **Tous les contributeurs** - Chaque contribution compte !
+
+### Technologies utilisées
+
+Ce template utilise uniquement des dépendances modernes et maintenues :
+- Discord.js v14 pour l'interaction avec l'API Discord
+- TypeScript pour la sécurité des types
+- ts-node-dev pour le développement avec hot reload
+- dotenv pour la gestion des variables d'environnement
 
 ---
 
-⭐ **N'oubliez pas de mettre une étoile si ce projet vous a aidé !**
+## 🌟 Soutenez le projet
+
+Si ce template vous a aidé à créer votre bot Discord, n'hésitez pas à :
+
+⭐ **Mettre une étoile au projet**  
+🔄 **Partager avec d'autres développeurs**  
+💝 **Contribuer au développement**  
+
+---
+
+**Créé avec ❤️ par [Soren](https://github.com/Soren-git) | Template Discord Bot TypeScript**
