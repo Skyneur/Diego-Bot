@@ -7,6 +7,8 @@ const event = new Event<[Client, Message]>(
   "messageCreate",
   async (client, message) => {
     if (message.author.bot) return;
+    
+    // Traitement des commandes préfixées (nécessite MessageContent intent)
     if (message.content.startsWith(config.prefix)) {
       let array = message.content.split(" ");
       let args = array.slice(1);

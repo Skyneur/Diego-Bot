@@ -2,8 +2,8 @@ import { ActivityType } from "discord.js";
 import type { Config } from "@mytypes/config";
 
 const config: Config = {
-  language: "en",
-  prefix: "$",
+  language: "fr",
+  prefix: "!",
   status: "dnd",
   activities: [
     {

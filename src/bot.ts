@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 const events = require("discord-events.js");
 import { handleEvents } from "./handlers/events";
-import { Client, Collection } from "discord.js";
+import { Client, Collection, GatewayIntentBits } from "discord.js";
 import { _T } from "./utils/translator";
 import config from "@src/config";
 import { Console } from "@src/utils/console/namespace";
@@ -14,7 +14,13 @@ declare module "discord.js" {
   }
 }
 
-const bot = new Client({ intents: [3276799] });
+const bot = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
+});
 bot.commands = new Collection();
 
 bot.login(process.env.TOKEN).then(async () => {
