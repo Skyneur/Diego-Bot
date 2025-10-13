@@ -1,4 +1,6 @@
+.gitignore
 .env
 node_modules
 dist
 pnpm-lock.yaml
+copilot-instructions.md
