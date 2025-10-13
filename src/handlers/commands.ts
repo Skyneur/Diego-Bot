@@ -46,16 +46,12 @@ export const handleCommands = async (client: Client) => {
   let loaded_commands: (string | number)[][] = [];
   let commands: Array<ContextMenuCommandBuilder | SlashCommandBuilder> = [];
   
-  // Obtenir la liste des fichiers de commande
   const commandFiles = fs.readdirSync(location)
     .filter(file => file.endsWith(".ts") && fs.statSync(path.join(location, file)).isFile());
   
-  // Parcourir chaque fichier de commande
   for (const file of commandFiles) {
-    // Essayons de charger la commande avec gestion d'erreur
     let commandModule;
     try {
-      // Effacer le cache pour éviter les doublons
       delete require.cache[require.resolve(`../commands/${file}`)];
       commandModule = require(`../commands/${file}`).default;
     } catch (error: any) {
@@ -69,10 +65,8 @@ export const handleCommands = async (client: Client) => {
     }
     
     const command = commandModule;
-    // Enregistrer la commande dans la collection
     client.commands.set(command.name, command);
     
-    // Ajouter à la liste des commandes chargées sans logs détaillés
     loaded_commands.push([file, `^gChargé`]);
       
     if (command.type == "slash") {
@@ -91,7 +85,6 @@ export const handleCommands = async (client: Client) => {
               .setDescription(option.description)
               .setRequired(option.required);
 
-            // Les choix sont disponibles uniquement pour les options String et Number
             if (option.choices && option.choices.length > 0) {
               if (["String", "Number"].includes(option.type)) {
                 try {
@@ -99,15 +92,12 @@ export const handleCommands = async (client: Client) => {
                     (choice: { name: string; value: any }) => ({ name: choice.name, value: choice.value })
                   );
                   
-                  // Dans discord.js v14, addChoices s'attend à recevoir plusieurs objets, pas un tableau
                   if (typeof opt.addChoices === 'function') {
                     opt.addChoices(...choices);
                   }
                 } catch (choiceError: any) {
                   console.error(`Impossible d'ajouter des choix: ${choiceError?.message || 'Erreur inconnue'}`);
                 }
-              } else {
-                // Les types User, Channel, Role ne supportent pas les choix, mais nous ne déclenchons pas d'erreur
               }
             }
             return opt;
@@ -135,12 +125,9 @@ export const handleCommands = async (client: Client) => {
   if (client.user && client.token) {
     const rest = new REST({ version: "10" }).setToken(client.token);
     try {
-      // Synchronisation silencieuse des commandes avec Discord
       await rest.put(Routes.applicationCommands(client.user.id), {
         body: commands,
       });
-      
-      // Log uniquement en cas d'erreur
     } catch (error) {
       Console.box("^r", "Discord API", [
         { type: "error", content: `Erreur lors de la synchronisation des commandes: ${error}` }

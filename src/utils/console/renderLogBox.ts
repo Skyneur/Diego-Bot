@@ -1,4 +1,3 @@
-// utils/logBox.ts
 import colors from '@src/constants/consoleFormats'
 import formatConsole from "./consoleFormatter";
 import stripAnsi from "./stripAnsi";
@@ -6,7 +5,6 @@ import type { IconType } from "@mytypes/iconType";
 import type { LogIcon } from "@mytypes/logIcon";
 import type { LogBoxLine } from "@mytypes/logBoxLine";
 
-// Caractères ASCII pour les bordures
 const CHARS = ["┌", "─", "┐", "┘", "└", "│", "├", "┤", "┬", "┴", "┼"] as const;
 
 const ICONS: Record<IconType, LogIcon> = {
@@ -40,7 +38,7 @@ export function renderLogBox(
     maxWidth = 58;
   }
 
-  // Affiche la ligne du haut
+
   const titleDisplay = ` ${title.toUpperCase()} `;
   const remaining = maxWidth - titleDisplay.length;
   const leftPad = 2;
@@ -56,7 +54,7 @@ export function renderLogBox(
     )
   );
 
-  // Affiche chaque ligne de contenu
+
   lines.forEach((line) => {
     const pad = maxWidth - stripAnsi(line).length;
     console.log(
@@ -68,7 +66,7 @@ export function renderLogBox(
     );
   });
 
-  // Ligne du bas
+
   console.log(
     formatConsole(
       colorCode + CHARS[4] + CHARS[1].repeat(maxWidth + 1) + CHARS[3]

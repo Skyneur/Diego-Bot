@@ -12,7 +12,7 @@ const environment = process.env.NODE_ENV === ENV.PRODUCTION
   : ENV.DEVELOPMENT as "development";
 const isDev = environment === ENV.DEVELOPMENT;
 
-const DEV_STARTUP_MESSAGE = true; // Mettre à true pour activer les messages en développement
+const DEV_STARTUP_MESSAGE = true;
 const sendStartupMsg = !isDev || DEV_STARTUP_MESSAGE;
 
 const config: Config = {

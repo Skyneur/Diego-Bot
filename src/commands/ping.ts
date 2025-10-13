@@ -31,7 +31,6 @@ const command = new Command<[Client, Message | CommandInteraction]>(
     const wsLatency = client.ws.ping;
     const uptime = formatUptime(client.uptime || 0);
     
-    // Statistiques système
     const memoryUsage = process.memoryUsage();
     const memoryUsedMB = (memoryUsage.heapUsed / 1024 / 1024).toFixed(2);
     const memoryTotalMB = (memoryUsage.heapTotal / 1024 / 1024).toFixed(2);

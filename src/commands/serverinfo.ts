@@ -10,7 +10,6 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
   null,
   [],
   async (client, interaction) => {
-    // Vérifier que la commande est utilisée dans un serveur
     if (!interaction.guild) {
       await interaction.reply({
         content: "Cette commande ne peut être utilisée que dans un serveur.",
@@ -19,31 +18,24 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
       return;
     }
 
-    // Récupérer les données complètes du serveur
     const guild = await interaction.guild.fetch();
     
-    // Calculer les statistiques des membres
     const totalMembers = guild.memberCount;
     const humans = guild.members.cache.filter(member => !member.user.bot).size;
     const bots = guild.members.cache.filter(member => member.user.bot).size;
     
-    // Calculer les statistiques des salons
     const textChannels = guild.channels.cache.filter(c => c.isTextBased()).size;
     const voiceChannels = guild.channels.cache.filter(c => c.isVoiceBased()).size;
     const categories = guild.channels.cache.filter(c => c.type === 4).size;
     
-    // Calculer les statistiques des rôles (en excluant @everyone)
     const roles = guild.roles.cache.size - 1;
     
-    // Calculer la date de création et l'âge du serveur
     const creationDate = guild.createdAt.toLocaleDateString("fr-FR");
     const serverAge = calculateAge(guild.createdAt);
     
-    // Calculer le niveau de boost
     const boostLevel = guild.premiumTier;
     const boostCount = guild.premiumSubscriptionCount || 0;
     
-    // Créer l'embed
     const embed = new EmbedBuilder()
       .setTitle(`\`🔍\` **Informations sur ${guild.name}**`)
       .setDescription(`*Voici les informations détaillées du serveur.*`)
@@ -66,17 +58,14 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
       .setFooter({ text: `Demandé par ${interaction.user.tag}` })
       .setTimestamp();
     
-    // Ajouter la bannière si elle existe
     if (guild.banner) {
       embed.setImage(guild.bannerURL({ size: 1024 }) || '');
     }
     
-    // Envoyer l'embed
     await interaction.reply({ embeds: [embed] });
   }
 );
 
-// Fonction pour calculer l'âge du serveur
 function calculateAge(date: Date): string {
   const now = new Date();
   const diffTime = Math.abs(now.getTime() - date.getTime());
@@ -94,7 +83,6 @@ function calculateAge(date: Date): string {
   return age;
 }
 
-// Fonction pour traduire le niveau de vérification
 function getVerificationLevel(level: number): string {
   switch (level) {
     case 0: return "Aucune";
@@ -106,5 +94,4 @@ function getVerificationLevel(level: number): string {
   }
 }
 
-// Assurez-vous que cette commande est correctement exportée
 export default command;

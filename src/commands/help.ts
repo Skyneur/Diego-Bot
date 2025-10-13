@@ -10,16 +10,12 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
   null,
   [],
   async (client, interaction) => {
-    // Récupérer toutes les commandes
     const commands = Array.from(client.commands.values());
     
-    // Définir une interface pour nos commandes
     interface CommandInfo {
       name: string;
       description: string;
     }
-    
-    // Créer des catégories avec le type approprié
     const categories: Record<string, CommandInfo[]> = {
       "Informations": [],
       "Utilitaires": [],
@@ -28,9 +24,8 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
       "Autres": []
     };
     
-    // Catégoriser les commandes
     for (const cmd of commands) {
-      if (cmd.type !== "slash") continue; // Ne montrer que les commandes slash
+      if (cmd.type !== "slash") continue;
       
       const commandName = cmd.name;
       const commandDesc = cmd.description;
@@ -48,15 +43,12 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
       }
     }
     
-    // Créer l'embed
     const embed = new EmbedBuilder()
       .setTitle(`\`📚\` **Aide - Liste des commandes**`)
       .setDescription(`*Voici la liste de toutes les commandes disponibles.*`)
       .setColor(config.color as ColorResolvable)
       .setFooter({ text: `${commands.length} commandes disponibles • Demandé par ${interaction.user.tag}` })
       .setTimestamp();
-    
-    // Ajouter les commandes à l'embed par catégorie
     for (const [category, cmds] of Object.entries(categories)) {
       if (cmds.length > 0) {
         let commandList = '';
@@ -73,12 +65,9 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
       }
     }
     
-    // Envoyer l'embed
     await interaction.reply({ embeds: [embed] });
   }
 );
-
-// Fonction pour obtenir une icône en fonction de la catégorie
 function getCategoryIcon(category: string): string {
   switch (category) {
     case "Informations": return "ℹ️";

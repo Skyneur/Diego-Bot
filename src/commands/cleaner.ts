@@ -45,7 +45,6 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
     }
   ],
   async (client, interaction) => {
-    // Vérifier les permissions
     if (!interaction.memberPermissions?.has("ManageMessages")) {
       const errorEmbed = new EmbedBuilder()
         .setTitle("`❌` **Erreur de permission**")
@@ -60,14 +59,11 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
       return;
     }
     
-    // Récupérer l'action choisie
     const action = interaction.options.getString("action");
     
     if (action === "commands") {
-      // Action pour nettoyer les commandes
       await cleanCommands(client, interaction);
     } else if (action === "messages") {
-      // Action pour supprimer des messages
       await cleanMessages(client, interaction);
     } else {
       const errorEmbed = new EmbedBuilder()
@@ -84,9 +80,7 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
   }
 );
 
-// Fonction pour nettoyer les commandes
 async function cleanCommands(client: Client, interaction: ChatInputCommandInteraction) {
-  // Seuls les administrateurs peuvent utiliser cette partie
   if (!interaction.memberPermissions?.has("Administrator")) {
     const errorEmbed = new EmbedBuilder()
       .setTitle("`❌` **Erreur de permission**")
@@ -101,10 +95,7 @@ async function cleanCommands(client: Client, interaction: ChatInputCommandIntera
     return;
   }
   
-  // Répondre initialement
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-  
-  // Vérifier que le client a un utilisateur
   if (!client.user) {
     const errorEmbed = new EmbedBuilder()
       .setTitle("`❌` **Erreur système**")
@@ -116,23 +107,18 @@ async function cleanCommands(client: Client, interaction: ChatInputCommandIntera
     return;
   }
   
-  // Initialiser l'API REST Discord
   const rest = new REST({ version: "10" }).setToken(client.token as string);
   
   try {
-    // Récupérer les commandes existantes
     const existingCommands = await rest.get(
       Routes.applicationCommands(client.user.id)
     ) as Array<{ id: string, name: string }>;
-    
-    // Créer un embed pour afficher les informations
     const embed = new EmbedBuilder()
       .setTitle("`🧹` **Nettoyage des commandes**")
       .setDescription("*Synchronisation des commandes avec Discord...*")
       .setColor(config.color as ColorResolvable)
       .setTimestamp();
     
-    // Première étape: Récupération des commandes existantes
     let commandList = "";
     existingCommands.forEach(cmd => {
       commandList += `\`/${cmd.name}\` (ID: ${cmd.id})\n`;
@@ -143,25 +129,20 @@ async function cleanCommands(client: Client, interaction: ChatInputCommandIntera
       value: commandList || "Aucune commande trouvée",
       inline: false
     });
-    
-    // Deuxième étape: Suppression des commandes
+
     embed.addFields({
       name: "`🗑️` **Suppression des commandes**",
       value: "Suppression en cours...",
       inline: false
     });
     
-    // Mettre à jour le message
     await interaction.editReply({ embeds: [embed] });
-    
-    // Supprimer toutes les commandes
     for (const command of existingCommands) {
       await rest.delete(
         Routes.applicationCommand(client.user.id, command.id)
       );
     }
     
-    // Troisième étape: Scan du répertoire de commandes
     const commandsDir = path.join(process.cwd(), "src/commands");
     const commandFiles = fs.readdirSync(commandsDir)
       .filter(file => file.endsWith(".ts") || file.endsWith(".js"));
@@ -172,11 +153,7 @@ async function cleanCommands(client: Client, interaction: ChatInputCommandIntera
       inline: false
     });
     
-    // Mettre à jour le message
     await interaction.editReply({ embeds: [embed] });
-    
-    // Quatrième étape: Réenregistrement des commandes
-    // On réutilise la logique de traitement des commandes du handler
     const commands = [];
     let loadedCommands = [];
     
@@ -217,10 +194,7 @@ async function cleanCommands(client: Client, interaction: ChatInputCommandIntera
       inline: false
     });
     
-    // Mettre à jour le message
     await interaction.editReply({ embeds: [embed] });
-    
-    // Cinquième étape: Envoi à l'API Discord
     await rest.put(
       Routes.applicationCommands(client.user.id),
       { body: commands }
@@ -232,11 +206,10 @@ async function cleanCommands(client: Client, interaction: ChatInputCommandIntera
       inline: false
     });
     
-    // Mettre à jour le message final
+
     await interaction.editReply({ embeds: [embed] });
     
   } catch (error: any) {
-    // En cas d'erreur
     const errorEmbed = new EmbedBuilder()
       .setTitle("`❌` **Erreur**")
       .setDescription(`*Une erreur est survenue lors de la synchronisation:*\n\`\`\`\n${error?.message || "Erreur inconnue"}\n\`\`\``)
@@ -246,18 +219,12 @@ async function cleanCommands(client: Client, interaction: ChatInputCommandIntera
     await interaction.editReply({ embeds: [errorEmbed] });
   }
 }
-
-// Fonction pour supprimer des messages
 async function cleanMessages(client: Client, interaction: ChatInputCommandInteraction) {
-  // Récupérer les options
   const amount = interaction.options.getNumber("nombre") || 10;
   const targetUser = interaction.options.getUser("utilisateur");
   const targetChannel = interaction.options.getChannel("canal") || interaction.channel;
   
-  // Vérifier que le nombre est valide (entre 1 et 100)
   const messageCount = Math.min(Math.max(Math.floor(amount), 1), 100);
-  
-  // Vérifier que le canal est un canal de texte
   if (!targetChannel || targetChannel.type !== ChannelType.GuildText) {
     const errorEmbed = new EmbedBuilder()
       .setTitle("`❌` **Canal non valide**")
@@ -271,14 +238,12 @@ async function cleanMessages(client: Client, interaction: ChatInputCommandIntera
     });
     return;
   }
-  
-  // Différer la réponse pour avoir le temps de traiter
+
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });
   
   try {
     const textChannel = targetChannel as TextChannel;
     
-    // Créer un embed pour le début de l'opération
     const startEmbed = new EmbedBuilder()
       .setTitle("`🧹` **Nettoyage des messages**")
       .setDescription(`*Suppression en cours dans ${textChannel}...*`)
@@ -292,23 +257,18 @@ async function cleanMessages(client: Client, interaction: ChatInputCommandIntera
     
     await interaction.editReply({ embeds: [startEmbed] });
     
-    // Récupérer les messages
     let fetchedMessages: Collection<string, Message<true>>;
     
-    // Limiter le nombre de messages à récupérer
     fetchedMessages = await textChannel.messages.fetch({ limit: 100 });
-    
-    // Filtrer les messages si un utilisateur est spécifié
+
     let messagesToDelete: Message<true>[] = [...fetchedMessages.values()];
     
     if (targetUser) {
       messagesToDelete = messagesToDelete.filter(msg => msg.author.id === targetUser.id);
     }
     
-    // Limiter au nombre demandé
     messagesToDelete = messagesToDelete.slice(0, messageCount);
     
-    // Compter les messages à supprimer
     const deleteCount = messagesToDelete.length;
     
     if (deleteCount === 0) {
@@ -326,18 +286,14 @@ async function cleanMessages(client: Client, interaction: ChatInputCommandIntera
       return;
     }
     
-    // Supprimer les messages en bulk si possible
     if (deleteCount > 1 && messagesToDelete.every(msg => Date.now() - msg.createdTimestamp < 1209600000)) {
-      // Tous les messages ont moins de 14 jours, on peut utiliser bulkDelete
       await textChannel.bulkDelete(messagesToDelete);
     } else {
-      // Suppression individuelle pour les messages plus anciens
       for (const message of messagesToDelete) {
         await message.delete().catch(console.error);
       }
     }
     
-    // Créer un embed pour le résultat
     const resultEmbed = new EmbedBuilder()
       .setTitle("`✅` **Nettoyage terminé**")
       .setDescription(`*${deleteCount} messages ont été supprimés dans ${textChannel}*`)
@@ -355,7 +311,6 @@ async function cleanMessages(client: Client, interaction: ChatInputCommandIntera
     await interaction.editReply({ embeds: [resultEmbed] });
     
   } catch (error: any) {
-    // En cas d'erreur
     const errorEmbed = new EmbedBuilder()
       .setTitle("`❌` **Erreur**")
       .setDescription(`*Une erreur est survenue lors de la suppression des messages:*\n\`\`\`\n${error?.message || "Erreur inconnue"}\n\`\`\``)
@@ -366,7 +321,6 @@ async function cleanMessages(client: Client, interaction: ChatInputCommandIntera
   }
 }
 
-// Fonction pour convertir les types d'options en valeurs numériques pour l'API Discord
 function getOptionType(type: string): number {
   switch (type) {
     case "String": return 3;
@@ -374,7 +328,7 @@ function getOptionType(type: string): number {
     case "User": return 6;
     case "Channel": return 7;
     case "Role": return 8;
-    default: return 3; // Par défaut String
+    default: return 3;
   }
 }
 

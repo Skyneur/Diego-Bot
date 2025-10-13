@@ -47,8 +47,7 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
       const targetUser = interaction.options.getUser("joueur") || interaction.user;
       const isAdmin = interaction.memberPermissions?.has("Administrator") || false;
       const isSelf = targetUser.id === interaction.user.id;
-      
-      // Vérifier les permissions si l'utilisateur cible n'est pas soi-même
+
       if (!isSelf && !isAdmin && (action === "win" || action === "loss" || action === "reset")) {
         await interaction.reply({
           embeds: [
@@ -189,11 +188,9 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
             .setDescription(`### Top ${leaderboard.length} des joueurs\n*Voici les meilleurs joueurs actuels sur ${gameName}*`)
             .setColor(config.color as ColorResolvable)
             .setTimestamp();
-          
-          // Ajouter une bannière pour les 3 premiers
+
           let topPlayersDesc = "";
-          
-          // Afficher les 3 premiers avec des médailles spéciales si disponibles
+
           for (let i = 0; i < Math.min(3, leaderboard.length); i++) {
             const player = leaderboard[i];
             const stats = player.games[gameType];
@@ -212,17 +209,15 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
               inline: false
             });
           }
-          
-          // Afficher tous les joueurs avec leurs stats détaillées
+
           leaderboard.forEach((player, index) => {
             const stats = player.games[gameType];
             const totalGames = stats.wins + stats.losses;
             const winRate = totalGames > 0 ? Math.round((stats.wins / totalGames) * 100) : 0;
-            
-            // Déterminer l'emoji à utiliser basé sur le winrate
+
             let ratingEmoji = "⚪";
-            if (winRate >= 70) ratingEmoji = "🟢";
-            else if (winRate >= 50) ratingEmoji = "🟠";
+            if (winRate >= 55) ratingEmoji = "🟢";
+            else if (winRate >=35) ratingEmoji = "🟠";
             else ratingEmoji = "🔴";
             
             leaderboardEmbed.addFields({

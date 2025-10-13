@@ -14,7 +14,6 @@ function renderTable({
   const targetWidth = 57;
   const numCols = headers.length;
 
-  // Calcul de la largeur par colonne (équitable)
   const availableWidth = targetWidth - (numCols + 1);
   const baseColWidth = Math.floor(availableWidth / numCols);
   const extraChars = availableWidth % numCols;
@@ -25,7 +24,6 @@ function renderTable({
 
   let fullWidth = colWidths.reduce((a, b) => a + b, 0) + headers.length + 1;
 
-  // ---- Ligne titre ----
   const titleDisplay = ` ${title.toUpperCase()} `;
   const remaining = fullWidth - titleDisplay.length;
   console.log(
@@ -38,8 +36,6 @@ function renderTable({
         chars[2]
     )
   );
-
-  // ---- Commentaire ----
   if (comment) {
     const commentClean = stripAnsi(formatConsole(comment));
     const paddedComment = ` ${comment}^R${" ".repeat(
@@ -52,7 +48,6 @@ function renderTable({
     );
   }
 
-  // ---- Ligne séparateur haut colonnes ----
   console.log(
     formatConsole(
       color +
@@ -61,8 +56,6 @@ function renderTable({
         chars[7]
     )
   );
-
-  // Fonction pour centrer le texte dans une colonne
   const centerText = (text: string, width: number): string => {
     const cleanText = stripAnsi(formatConsole(text));
     const padding = width - cleanText.length;
@@ -71,7 +64,6 @@ function renderTable({
     return " ^R".repeat(leftPad) + text + "^R ".repeat(rightPad);
   };
 
-  // ---- Headers ----
   let headerContent = "";
   headers.forEach((h, i) => {
     const centeredHeader = centerText(h, colWidths[i]);
@@ -86,7 +78,6 @@ function renderTable({
       formatConsole(color + chars[5])
   );
 
-  // ---- Ligne séparateur entête / données ----
   console.log(
     formatConsole(
       color +
@@ -95,8 +86,6 @@ function renderTable({
         chars[7]
     )
   );
-
-  // ---- Lignes de données ----
   rows.forEach((row) => {
     let rowContent = "";
     row.forEach((cell, i) => {
@@ -114,7 +103,6 @@ function renderTable({
     );
   });
 
-  // ---- Ligne de fin ----
   console.log(
     formatConsole(
       color +

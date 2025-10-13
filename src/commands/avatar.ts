@@ -18,13 +18,9 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
     }
   ],
   async (client, interaction) => {
-    // Récupérer l'utilisateur ciblé ou l'auteur de la commande
     const targetUser = interaction.options.getUser("utilisateur") || interaction.user;
     
-    // Récupérer différentes tailles d'avatar
     const avatarURL = targetUser.displayAvatarURL({ size: 4096 });
-    
-    // Créer l'embed
     const embed = new EmbedBuilder()
       .setTitle(`\`🖼️\` **Avatar de ${targetUser.tag}**`)
       .setDescription(`*Cliquez sur l'image pour la voir en taille originale.*`)
@@ -33,7 +29,6 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
       .setFooter({ text: `Demandé par ${interaction.user.tag}` })
       .setTimestamp();
     
-    // Options de téléchargement pour différentes tailles
     const sizes = [
       { size: 128, label: "128x128" },
       { size: 256, label: "256x256" },
@@ -42,15 +37,12 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
       { size: 2048, label: "2048x2048" },
       { size: 4096, label: "4096x4096" }
     ];
-    
-    // Ajouter un champ avec les liens vers différentes tailles
     let downloadLinks = "";
     sizes.forEach(({ size, label }) => {
       const url = targetUser.displayAvatarURL({ size });
       downloadLinks += `[${label}](${url}) • `;
     });
     
-    // Retirer le dernier séparateur
     downloadLinks = downloadLinks.slice(0, -3);
     
     embed.addFields({
@@ -59,7 +51,6 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
       inline: false
     });
     
-    // Envoyer l'embed
     await interaction.reply({ embeds: [embed] });
   }
 );

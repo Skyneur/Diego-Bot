@@ -12,21 +12,16 @@ const command = new Command<[Client, CommandInteraction]>(
   null,
   [],
   async (client, interaction) => {
-    // Créer un embed pour les informations de débogage
     const embed = new EmbedBuilder()
       .setTitle("`🔧` **Informations de débogage**")
       .setDescription("*Voici les informations de débogage du bot.*")
       .setColor(config.color as ColorResolvable)
       .setTimestamp();
 
-    // Récupérer la liste des fichiers de commandes
     const commandFiles = fs.readdirSync(path.join(process.cwd(), "src/commands"))
       .filter(file => file.endsWith(".ts"));
     
-    // Récupérer la liste des commandes chargées
     const loadedCommands = Array.from(client.commands.keys());
-    
-    // Ajouter les champs à l'embed
     embed.addFields(
       { name: "`📁` **Fichiers de commandes**", value: commandFiles.length > 0 ? `\`\`\`\n${commandFiles.join("\n")}\`\`\`` : "Aucun fichier trouvé", inline: false },
       { name: "`⚙️` **Commandes chargées**", value: loadedCommands.length > 0 ? `\`\`\`\n${loadedCommands.join("\n")}\`\`\`` : "Aucune commande chargée", inline: false },
@@ -38,7 +33,6 @@ const command = new Command<[Client, CommandInteraction]>(
       { name: "`📝` **Version**", value: `\`${config.version}\``, inline: true }
     );
     
-    // Envoyer l'embed
     await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
   }
 );

@@ -6,7 +6,6 @@ const event = new Event<[Client, Interaction]>(
   async (client, interaction) => {
     if (interaction.isCommand() || interaction.isContextMenuCommand()) {
       try {
-        // Récupérer la commande sans logs détaillés
         let command = client.commands.get(interaction.commandName);
         
         if (command) {
@@ -15,7 +14,6 @@ const event = new Event<[Client, Interaction]>(
           console.log(`ALERTE: Commande non trouvée: ${interaction.commandName}`);
           console.log(`Commandes disponibles:`, Array.from(client.commands.keys()));
           
-          // Informer l'utilisateur que la commande n'est pas reconnue
           if (interaction.isRepliable()) {
             const errorEmbed = new EmbedBuilder()
               .setTitle("`❌` **Commande non reconnue**")
@@ -35,7 +33,6 @@ const event = new Event<[Client, Interaction]>(
       } catch (error) {
         console.error(`Erreur avec la commande ${interaction.commandName}:`, error);
         
-        // Informer l'utilisateur de l'erreur
         if (interaction.isRepliable() && !interaction.replied) {
           const errorEmbed = new EmbedBuilder()
             .setTitle("`❌` **Erreur**")
@@ -53,5 +50,4 @@ const event = new Event<[Client, Interaction]>(
   }
 );
 
-// Export direct de l'événement
 export default event;

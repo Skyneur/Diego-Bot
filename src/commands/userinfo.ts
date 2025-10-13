@@ -18,11 +18,9 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
     }
   ],
   async (client, interaction) => {
-    // Récupérer l'utilisateur ciblé ou l'auteur de la commande
     const targetUser = interaction.options.getUser("utilisateur") || interaction.user;
     const targetMember = interaction.guild?.members.cache.get(targetUser.id);
     
-    // Préparer les informations
     const joinDate = targetMember?.joinedAt?.toLocaleDateString("fr-FR") || "N/A";
     const accountCreated = targetUser.createdAt.toLocaleDateString("fr-FR");
     const roles = targetMember?.roles.cache.filter(role => role.id !== interaction.guild?.id).map(role => role.toString()).join(", ") || "Aucun rôle";
@@ -32,8 +30,6 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
     const userFlags = targetUser.flags?.toArray().join(", ") || "Aucun badge";
     const status = getStatusString(targetMember);
     const nickname = targetMember?.nickname || "Aucun";
-    
-    // Créer l'embed
     const embed = new EmbedBuilder()
       .setTitle(`\`👤\` **Informations sur ${targetUser.tag}**`)
       .setDescription(`*Voici les informations détaillées sur l'utilisateur.*`)
@@ -51,17 +47,13 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
       .setFooter({ text: `Demandé par ${interaction.user.tag}` })
       .setTimestamp();
     
-    // Ajouter les rôles s'il y en a
     if (roles && roles !== "Aucun rôle") {
       embed.addFields({ name: '\`👑\` **Rôles**', value: roles, inline: false });
     }
     
-    // Envoyer l'embed
     await interaction.reply({ embeds: [embed] });
   }
 );
-
-// Fonction pour calculer la durée depuis une date
 function calculateDuration(date: Date): string {
   const now = new Date();
   const diffTime = Math.abs(now.getTime() - date.getTime());
@@ -79,7 +71,6 @@ function calculateDuration(date: Date): string {
   return duration;
 }
 
-// Fonction pour obtenir une représentation du statut de l'utilisateur
 function getStatusString(member: GuildMember | undefined): string {
   if (!member) return "Inconnu";
   

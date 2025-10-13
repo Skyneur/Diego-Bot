@@ -45,27 +45,22 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
     }
   ],
   async (client, interaction) => {
-    // Récupérer les options
     const nombreOption = interaction.options.get("nombre");
     const teamCount = Math.max(2, Math.min(25, nombreOption ? Number(nombreOption.value) : 2));
     const membersInput = interaction.options.getString("membres") || "";
     const gameType = interaction.options.getString("jeu") as GameType || "valorant";
     const mode = interaction.options.getString("mode") || "balanced";
     
-    // Traiter la liste des membres
     const membersList = membersInput
-      .split(/[\n,\s]+/) // Séparer par retour à la ligne, virgule ou espace
+      .split(/[\n,\s]+/)
       .map(member => member.trim())
       .filter(member => member.length > 0);
       
-    // Structure pour stocker les infos des joueurs
     interface TeamMember {
       id: string;
       name: string;
       skillRating: number;
     }
-    
-    // Vérifier qu'il y a suffisamment de membres
     if (membersList.length < 2) {
       const errorEmbed = new EmbedBuilder()
         .setTitle("`❌` **Erreur**")
@@ -80,7 +75,7 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
       return;
     }
     
-    // Vérifier que le nombre d'équipes est valide
+
     if (teamCount < 2 || teamCount > membersList.length) {
       const errorEmbed = new EmbedBuilder()
         .setTitle("`❌` **Erreur**")
@@ -95,33 +90,30 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
       return;
     }
     
-    // Créer un tableau de membres avec leurs statistiques
+
     let members: TeamMember[] = [];
     
     for (const memberId of membersList) {
       try {
-        // Essayer de récupérer l'utilisateur Discord
         let displayName = memberId;
-        let skillRating = 0; // Valeur par défaut
-        
-        // Vérifier si l'ID est valide
+        let skillRating = 0;
         if (/^\d{17,19}$/.test(memberId)) {
           try {
             const user = await client.users.fetch(memberId);
             if (user) {
               displayName = user.username;
               
-              // Récupérer les stats du joueur
+
               const playerStats = statsManager.getPlayerStats(memberId);
               if (playerStats) {
                 skillRating = playerStats.games[gameType].skillRating;
               } else {
-                // Créer un profil pour ce joueur s'il n'existe pas
+
                 statsManager.upsertPlayer(memberId, displayName);
               }
             }
           } catch (error) {
-            // Utiliser le memberId comme nom si l'utilisateur n'est pas trouvé
+
           }
         }
         
@@ -132,7 +124,7 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
         });
       } catch (error) {
         console.error(`Erreur lors de la récupération des stats pour ${memberId}:`, error);
-        // Ajouter quand même le membre avec des valeurs par défaut
+
         members.push({
           id: memberId,
           name: memberId,
@@ -141,17 +133,15 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
       }
     }
     
-    // Tableau pour stocker les membres de chaque équipe
     const teams: TeamMember[][] = Array(teamCount).fill(null).map(() => []);
     
     if (mode === "random") {
-      // Mode aléatoire - mélanger simplement les membres
       for (let i = members.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [members[i], members[j]] = [members[j], members[i]];
       }
       
-      // Répartir équitablement
+
       const membersPerTeam = Math.floor(members.length / teamCount);
       const extraMembers = members.length % teamCount;
       
@@ -168,17 +158,11 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
         }
       }
     } else {
-      // Mode équilibré - répartir selon le skill rating
-      
-      // 1. Trier les joueurs par score décroissant
       members.sort((a, b) => b.skillRating - a.skillRating);
       
-      // 2. Répartir les joueurs en zigzag pour équilibrer les équipes
       const teamSkillSum = Array(teamCount).fill(0);
       
-      // Répartir les joueurs les plus forts d'abord
       for (let i = 0; i < members.length; i++) {
-        // Trouver l'équipe avec le score total le plus bas
         let lowestTeamIndex = 0;
         for (let t = 1; t < teamCount; t++) {
           if (teamSkillSum[t] < teamSkillSum[lowestTeamIndex]) {
@@ -186,33 +170,27 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
           }
         }
         
-        // Ajouter le joueur à cette équipe
         teams[lowestTeamIndex].push(members[i]);
         teamSkillSum[lowestTeamIndex] += members[i].skillRating;
       }
     }
     
-    // Calculer les statistiques des équipes
     const teamStats = teams.map(team => {
       const totalSkill = team.reduce((sum, member) => sum + member.skillRating, 0);
       const avgSkill = team.length > 0 ? Math.round(totalSkill / team.length) : 0;
       return { total: totalSkill, average: avgSkill };
     });
     
-    // Déterminer le jeu pour l'affichage
     const gameNames = {
       valorant: "Valorant",
       lol: "League of Legends"
     };
-    
-    // Créer l'embed pour afficher les équipes
     const teamsEmbed = new EmbedBuilder()
       .setTitle(`\`🏆\` **Équipes ${gameNames[gameType]}**`)
       .setDescription(`*${members.length} membres répartis en ${teamCount} équipes - Mode: ${mode === "balanced" ? "Équilibré" : "Aléatoire"}*`)
       .setColor(config.color as ColorResolvable)
       .setTimestamp();
     
-    // Ajouter chaque équipe à l'embed
     teams.forEach((team, index) => {
       let teamDescription = "";
       
@@ -221,7 +199,6 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
           return `• ${member.name} (Score: ${member.skillRating})`;
         }).join('\n');
         
-        // Ajouter le score moyen de l'équipe
         teamDescription += `\n\n**Score moyen:** ${teamStats[index].average}`;
       } else {
         teamDescription = "Équipe vide";
@@ -234,7 +211,6 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
       });
     });
     
-    // Répondre avec l'embed des équipes
     await interaction.reply({
       embeds: [teamsEmbed]
     });
