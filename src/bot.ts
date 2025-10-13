@@ -2,11 +2,12 @@ import dotenv from "dotenv";
 dotenv.config();
 const events = require("discord-events.js");
 import { handleEvents } from "./handlers/events";
-import { Client, Collection, GatewayIntentBits } from "discord.js";
+import { Client, Collection, GatewayIntentBits, TextChannel, EmbedBuilder } from "discord.js";
 import { _T } from "./utils/translator";
 import config from "@src/config";
 import { Console } from "@src/utils/console/namespace";
 import { handleCommands } from "./handlers/commands";
+import os from "os";
 
 declare module "discord.js" {
   export interface Client {
@@ -46,5 +47,43 @@ bot.login(process.env.TOKEN).then(async () => {
       type: "default",
       content: _T("intents_count", { count: intentsCount }),
     },
+    {
+      type: "info",
+      content: `Mode: ${config.environment}`,
+    },
   ]);
+
+  // Envoyer un message de démarrage dans le canal configuré
+  if (config.startupMessage && config.logChannelId) {
+    try {
+      const logChannel = await bot.channels.fetch(config.logChannelId);
+      if (logChannel && logChannel.isTextBased()) {
+        const startupEmbed = new EmbedBuilder()
+          .setTitle("`🚀` **Bot démarré**")
+          .setDescription(`*Le bot a démarré avec succès en mode **${config.environment}**.*`)
+          .setColor(config.environment === "production" ? "#00FF00" : "#FFA500")
+          .addFields(
+            { name: "`💻` **Système**", value: `\`${os.type()} ${os.release()}\``, inline: true },
+            { name: "`🕰️` **Démarré à**", value: `\`${new Date().toLocaleString()}\``, inline: true },
+            { name: "`📋` **Version**", value: `\`${config.version}\``, inline: true },
+            { name: "`🔧` **Environnement**", value: `\`${config.environment}\``, inline: true },
+            { name: "`🌐` **Latence**", value: `\`${bot.ws.ping}ms\``, inline: true },
+            { name: "`📂` **Serveurs**", value: `\`${bot.guilds.cache.size}\``, inline: true }
+          )
+          .setTimestamp();
+        
+        // Cast le canal en TextChannel pour accéder à send()
+        const textChannel = logChannel as TextChannel;
+        await textChannel.send({ embeds: [startupEmbed] });
+        
+        Console.box("^b", "Startup message", [
+          { type: "success", content: "Message de démarrage envoyé dans le canal configuré" }
+        ]);
+      }
+    } catch (error) {
+      Console.box("^r", "Startup message", [
+        { type: "error", content: `Erreur lors de l'envoi du message de démarrage: ${error}` }
+      ]);
+    }
+  }
 });

@@ -14,8 +14,8 @@ const command = new Command<[Client, Message | CommandInteraction]>(
     const startTime = Date.now();
     
     const initialEmbed = new EmbedBuilder()
-      .setTitle("🏓 Ping en cours...")
-      .setDescription("Calcul de la latence en cours...")
+      .setTitle("`🏓` **Ping en cours...**")
+      .setDescription("*Calcul de la latence en cours...*")
       .setColor("#FFA500" as ColorResolvable)
       .setTimestamp();
     
@@ -40,19 +40,19 @@ const command = new Command<[Client, Message | CommandInteraction]>(
     const userCount = client.users.cache.size;
     
     const finalEmbed = new EmbedBuilder()
-      .setTitle("🏓 Pong!")
-      .setDescription(`Le bot est opérationnel !`)
+      .setTitle("`🏓` **Pong!**")
+      .setDescription(`**Le bot est opérationnel!** 🚀\n\n*Voici les statistiques actuelles:*`)
       .setColor("#00FF00" as ColorResolvable)
       .addFields(
-        { name: "📡 Latence API", value: `\`${apiLatency}ms\``, inline: true },
-        { name: "🌐 Latence WebSocket", value: `\`${wsLatency}ms\``, inline: true },
-        { name: "⏱️ Uptime", value: `\`${uptime}\``, inline: true },
-        { name: "🖥️ Système", value: `\`${osType}\``, inline: true },
-        { name: "📊 Mémoire", value: `\`${memoryUsedMB}MB / ${memoryTotalMB}MB\``, inline: true },
-        { name: "🔄 CPU", value: `\`${cpuUsage}%\``, inline: true },
-        { name: "🤖 Discord.js", value: `\`v${discordJsVersion}\``, inline: true },
-        { name: "📂 Serveurs", value: `\`${serverCount}\``, inline: true },
-        { name: "👥 Utilisateurs", value: `\`${userCount}\``, inline: true }
+        { name: "`📡` **Latence API**", value: `\`${apiLatency}ms\``, inline: true },
+        { name: "`🌐` **Latence WebSocket**", value: `\`${wsLatency}ms\``, inline: true },
+        { name: "`⏱️` **Uptime**", value: `\`${uptime}\``, inline: true },
+        { name: "`🖥️` **Système**", value: `\`${osType}\``, inline: true },
+        { name: "`📊` **Mémoire**", value: `\`${memoryUsedMB}MB / ${memoryTotalMB}MB\``, inline: true },
+        { name: "`🔄` **CPU**", value: `\`${cpuUsage}%\``, inline: true },
+        { name: "`🤖` **Discord.js**", value: `\`v${discordJsVersion}\``, inline: true },
+        { name: "`📂` **Serveurs**", value: `\`${serverCount}\``, inline: true },
+        { name: "`👥` **Utilisateurs**", value: `\`${userCount}\``, inline: true }
       )
       .setFooter({ text: `Demandé par ${isSlash ? (interaction as CommandInteraction).user.tag : (interaction as Message).author.tag}` })
       .setTimestamp();
