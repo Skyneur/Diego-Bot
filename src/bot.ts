@@ -25,15 +25,10 @@ const bot = new Client({
 bot.commands = new Collection();
 
 bot.login(process.env.TOKEN).then(async () => {
-  handleEvents(bot);
-  handleCommands(bot);
-  bot.user?.setPresence({
-    activities: config.activities,
-    status: config.status,
-  });
+  // 1. Connexion - Afficher les informations de connexion
   const intentsBitfield = bot.options.intents.bitfield;
   const intentsCount = intentsBitfield.toString(2).replace(/0/g, "").length;
-
+  
   Console.box("^g", _T("login"), [
     {
       type: "success",
@@ -52,14 +47,26 @@ bot.login(process.env.TOKEN).then(async () => {
       content: `Mode: ${config.environment}`,
     },
   ]);
-
-  // Informations sur le mode de démarrage
+  
+  // 2. Information - Afficher les informations sur le mode de démarrage
   Console.box("^y", "Informations", [
     { type: "info", content: `Environnement: ${config.environment}` },
     { type: "info", content: `Message de démarrage: ${config.startupMessage ? "Activé" : "Désactivé"}` }
   ]);
-
-  // Envoyer un message de démarrage dans le canal configuré uniquement si activé
+  
+  // 3. Événements - Charger les gestionnaires d'événements
+  await handleEvents(bot);
+  
+  // 4. Commandes - Charger les commandes
+  await handleCommands(bot);
+  
+  // Configurer la présence du bot
+  bot.user?.setPresence({
+    activities: config.activities,
+    status: config.status,
+  });
+  
+  // 5. Message de démarrage - Envoyer un message dans le canal configuré si activé
   if (config.startupMessage && config.logChannelId) {
     try {
       const logChannel = await bot.channels.fetch(config.logChannelId);

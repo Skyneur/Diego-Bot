@@ -22,7 +22,7 @@ const command = new Command<[Client, Message | CommandInteraction]>(
     
     let initialResponse;
     if (isSlash) {
-      initialResponse = await interaction.reply({ embeds: [initialEmbed], fetchReply: true });
+      initialResponse = await interaction.reply({ embeds: [initialEmbed], withResponse: true });
     } else {
       initialResponse = await (interaction as Message).reply({ embeds: [initialEmbed] });
     }

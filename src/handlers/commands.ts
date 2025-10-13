@@ -45,54 +45,84 @@ let location = "./src/commands";
 export const handleCommands = async (client: Client) => {
   let loaded_commands: (string | number)[][] = [];
   let commands: Array<ContextMenuCommandBuilder | SlashCommandBuilder> = [];
-  await fs.readdirSync(location).forEach((file) => {
-    const fStats = fs.statSync(path.join(location, file));
-    if (fStats.isFile() && file.endsWith(".ts")) {
-      const command: { command: Command<any> } =
-        require(`../commands/${file}`).default;
-      if (!command || !(command instanceof Command)) {
-        console.error(_T("invalid_command", { file: file }));
-        return;
-      }
-      client.commands.set(command.name, command);
-      if (command.type == "slash") {
-        let slashCommand = new SlashCommandBuilder()
-          .setName(command.name)
-          .setDescription(command.description)
-          .setDefaultMemberPermissions(command.permission);
-
-        for (let option of command.options) {
-          const method = `add${option.type}Option` as keyof SlashCommandBuilder;
-
-          if (method in slashCommand) {
-            (slashCommand[method] as Function)((opt: any) => {
-              opt
-                .setName(option.name)
-                .setDescription(option.description)
-                .setRequired(option.required);
-
-              if (option.choices) {
-                opt.addChoices(
-                  option.choices.map(
-                    (choice: { name: string; value: any }) => ({ ...choice })
-                  )
-                );
-              }
-              return opt;
-            });
-          }
-        }
-        commands.push(slashCommand);
-      } else if (command.type == "context" && command.context_type) {
-        let contextCommand = new ContextMenuCommandBuilder()
-          .setName(command.name)
-          .setType(command.context_type)
-          .setDefaultMemberPermissions(command.permission);
-        commands.push(contextCommand);
-      }
+  
+  // Obtenir la liste des fichiers de commande
+  const commandFiles = fs.readdirSync(location)
+    .filter(file => file.endsWith(".ts") && fs.statSync(path.join(location, file)).isFile());
+  
+  // Parcourir chaque fichier de commande
+  for (const file of commandFiles) {
+    // Essayons de charger la commande avec gestion d'erreur
+    let commandModule;
+    try {
+      // Effacer le cache pour éviter les doublons
+      delete require.cache[require.resolve(`../commands/${file}`)];
+      commandModule = require(`../commands/${file}`).default;
+    } catch (error: any) {
+      console.error(`Erreur lors du chargement du fichier ${file}:`, error);
+      continue;
     }
-    loaded_commands.push([file, `^g${_T("loaded")}`]);
-  });
+    
+    if (!commandModule || !(commandModule instanceof Command)) {
+      console.error(_T("invalid_command", { file: file }));
+      continue;
+    }
+    
+    const command = commandModule;
+    // Enregistrer la commande dans la collection
+    client.commands.set(command.name, command);
+    
+    // Ajouter à la liste des commandes chargées sans logs détaillés
+    loaded_commands.push([file, `^gChargé`]);
+      
+    if (command.type == "slash") {
+      let slashCommand = new SlashCommandBuilder()
+        .setName(command.name)
+        .setDescription(command.description)
+        .setDefaultMemberPermissions(command.permission);
+
+      for (let option of command.options) {
+        const method = `add${option.type}Option` as keyof SlashCommandBuilder;
+
+        if (method in slashCommand) {
+          (slashCommand[method] as Function)((opt: any) => {
+            opt
+              .setName(option.name)
+              .setDescription(option.description)
+              .setRequired(option.required);
+
+            // Les choix sont disponibles uniquement pour les options String et Number
+            if (option.choices && option.choices.length > 0) {
+              if (["String", "Number"].includes(option.type)) {
+                try {
+                  const choices = option.choices.map(
+                    (choice: { name: string; value: any }) => ({ name: choice.name, value: choice.value })
+                  );
+                  
+                  // Dans discord.js v14, addChoices s'attend à recevoir plusieurs objets, pas un tableau
+                  if (typeof opt.addChoices === 'function') {
+                    opt.addChoices(...choices);
+                  }
+                } catch (choiceError: any) {
+                  console.error(`Impossible d'ajouter des choix: ${choiceError?.message || 'Erreur inconnue'}`);
+                }
+              } else {
+                // Les types User, Channel, Role ne supportent pas les choix, mais nous ne déclenchons pas d'erreur
+              }
+            }
+            return opt;
+          });
+        }
+      }
+      commands.push(slashCommand);
+    } else if (command.type == "context" && command.context_type) {
+      let contextCommand = new ContextMenuCommandBuilder()
+        .setName(command.name)
+        .setType(command.context_type)
+        .setDefaultMemberPermissions(command.permission);
+      commands.push(contextCommand);
+    }
+  }
 
   Console.table({
     color: "^b",
@@ -104,8 +134,17 @@ export const handleCommands = async (client: Client) => {
 
   if (client.user && client.token) {
     const rest = new REST({ version: "10" }).setToken(client.token);
-    rest.put(Routes.applicationCommands(client.user.id), {
-      body: commands,
-    });
+    try {
+      // Synchronisation silencieuse des commandes avec Discord
+      await rest.put(Routes.applicationCommands(client.user.id), {
+        body: commands,
+      });
+      
+      // Log uniquement en cas d'erreur
+    } catch (error) {
+      Console.box("^r", "Discord API", [
+        { type: "error", content: `Erreur lors de la synchronisation des commandes: ${error}` }
+      ]);
+    }
   }
 };
