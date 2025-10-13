@@ -20,11 +20,15 @@ export const handleEvents = async (client: Client) => {
   await fs.readdirSync(location).forEach((file) => {
     const fStats = fs.statSync(path.join(location, file));
     if (fStats.isFile() && file.endsWith(".ts")) {
-      const event: { event: Event<any> } = require(`../events/${file}`).default;
+      const eventModule = require(`../events/${file}`).default;
+      // Prend en charge les deux formats d'export: direct ou avec {event}
+      const event = eventModule.event || eventModule;
+      
       if (!event || !(event instanceof Event)) {
         console.error(_T("invalid_event", { file: file }));
         return;
       }
+      
       client.on(event.type, (...args) => event.execute(client, ...args));
       loaded_events.push([file, `^g${_T("loaded")}`]);
     }

@@ -9,4 +9,5 @@ export interface Config {
   version: string;
   startupMessage: boolean;
   logChannelId: string;
+  color: string;
 }

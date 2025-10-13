@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 const events = require("discord-events.js");
 import { handleEvents } from "./handlers/events";
-import { Client, Collection, GatewayIntentBits, TextChannel, EmbedBuilder } from "discord.js";
+import { Client, Collection, GatewayIntentBits, TextChannel, EmbedBuilder, ColorResolvable } from "discord.js";
 import { _T } from "./utils/translator";
 import config from "@src/config";
 import { Console } from "@src/utils/console/namespace";
@@ -53,7 +53,13 @@ bot.login(process.env.TOKEN).then(async () => {
     },
   ]);
 
-  // Envoyer un message de démarrage dans le canal configuré
+  // Informations sur le mode de démarrage
+  Console.box("^y", "Informations", [
+    { type: "info", content: `Environnement: ${config.environment}` },
+    { type: "info", content: `Message de démarrage: ${config.startupMessage ? "Activé" : "Désactivé"}` }
+  ]);
+
+  // Envoyer un message de démarrage dans le canal configuré uniquement si activé
   if (config.startupMessage && config.logChannelId) {
     try {
       const logChannel = await bot.channels.fetch(config.logChannelId);
@@ -61,7 +67,7 @@ bot.login(process.env.TOKEN).then(async () => {
         const startupEmbed = new EmbedBuilder()
           .setTitle("`🚀` **Bot démarré**")
           .setDescription(`*Le bot a démarré avec succès en mode **${config.environment}**.*`)
-          .setColor(config.environment === "production" ? "#00FF00" : "#FFA500")
+          .setColor(config.color as ColorResolvable)
           .addFields(
             { name: "`💻` **Système**", value: `\`${os.type()} ${os.release()}\``, inline: true },
             { name: "`🕰️` **Démarré à**", value: `\`${new Date().toLocaleString()}\``, inline: true },
@@ -72,7 +78,6 @@ bot.login(process.env.TOKEN).then(async () => {
           )
           .setTimestamp();
         
-        // Cast le canal en TextChannel pour accéder à send()
         const textChannel = logChannel as TextChannel;
         await textChannel.send({ embeds: [startupEmbed] });
         
@@ -85,5 +90,9 @@ bot.login(process.env.TOKEN).then(async () => {
         { type: "error", content: `Erreur lors de l'envoi du message de démarrage: ${error}` }
       ]);
     }
+  } else if (config.environment === "development") {
+    Console.box("^b", "Startup message", [
+      { type: "info", content: "Messages de démarrage désactivés en mode développement" }
+    ]);
   }
 });

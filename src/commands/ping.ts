@@ -1,6 +1,7 @@
 import { Command } from "@src/handlers/commands";
 import { Client, Message, EmbedBuilder, ColorResolvable, CommandInteraction, version as discordJsVersion } from "discord.js";
 import { _T } from "@src/utils/translator";
+import config from "@src/config";
 import os from "os";
 
 const command = new Command<[Client, Message | CommandInteraction]>(
@@ -16,7 +17,7 @@ const command = new Command<[Client, Message | CommandInteraction]>(
     const initialEmbed = new EmbedBuilder()
       .setTitle("`🏓` **Ping en cours...**")
       .setDescription("*Calcul de la latence en cours...*")
-      .setColor("#FFA500" as ColorResolvable)
+      .setColor(config.color as ColorResolvable)
       .setTimestamp();
     
     let initialResponse;
@@ -42,7 +43,7 @@ const command = new Command<[Client, Message | CommandInteraction]>(
     const finalEmbed = new EmbedBuilder()
       .setTitle("`🏓` **Pong!**")
       .setDescription(`**Le bot est opérationnel!** 🚀\n\n*Voici les statistiques actuelles:*`)
-      .setColor("#00FF00" as ColorResolvable)
+      .setColor(config.color as ColorResolvable)
       .addFields(
         { name: "`📡` **Latence API**", value: `\`${apiLatency}ms\``, inline: true },
         { name: "`🌐` **Latence WebSocket**", value: `\`${wsLatency}ms\``, inline: true },

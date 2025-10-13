@@ -1,0 +1,15 @@
+{
+  "login": "Connexion",
+  "login_success": "Connecté en tant que : ^r{tag}",
+  "date": "Date : ^y{date}",
+  "intents_count": "Nombre d'intents : ^y{count}",
+  "invalid_event": "{file} n'est pas un événement valide !",
+  "loaded": "Chargé",
+  "events": "Événements",
+  "name": "Nom",
+  "status": "Statut",
+  "found_events": "Événements trouvés : ^r{count}",
+  "invalid_command": "{file} n'est pas une commande valide !",
+  "found_commands": "Commandes trouvées : ^c{count}",
+  "commands": "Commandes"
+}

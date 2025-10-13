@@ -1,11 +1,28 @@
 import { ActivityType } from "discord.js";
 import type { Config } from "@mytypes/config";
 
-const isDev = process.env.NODE_ENV !== "production";
+
+const ENV = {
+  PRODUCTION: "production",
+  DEVELOPMENT: "development"
+};
+
+const environment = process.env.NODE_ENV === ENV.PRODUCTION 
+  ? ENV.PRODUCTION as "production" 
+  : ENV.DEVELOPMENT as "development";
+const isDev = environment === ENV.DEVELOPMENT;
+
+const DEV_STARTUP_MESSAGE = true; // Mettre à true pour activer les messages en développement
+const sendStartupMsg = !isDev || DEV_STARTUP_MESSAGE;
 
 const config: Config = {
   language: "fr",
   prefix: "!",
+  version: "1.0.0",
+  color: "#ea6434",
+  
+  environment: environment,
+  
   status: isDev ? "idle" : "online",
   activities: [
     {
@@ -13,10 +30,9 @@ const config: Config = {
       type: ActivityType.Custom,
     },
   ],
-  environment: isDev ? "development" : "production",
-  version: "1.0.0",
-  startupMessage: true,
-  logChannelId: process.env.LOG_CHANNEL_ID || "",
+  
+  startupMessage: sendStartupMsg,
+  logChannelId: process.env.LOG_CHANNEL_ID || "1426588221323743374",
 };
 
 export default config;
