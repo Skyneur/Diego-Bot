@@ -23,6 +23,9 @@ const config: Config = {
   
   environment: environment,
   
+  // Activer l'enregistrement automatique des commandes au démarrage du bot
+  autoRegisterCommands: true,
+  
   status: isDev ? "idle" : "online",
   activities: [
     {

@@ -122,16 +122,32 @@ export const handleCommands = async (client: Client) => {
     comment: _T("found_commands", { count: loaded_commands.length }),
   });
 
-  if (client.user && client.token) {
+  // Vérifier si l'enregistrement automatique des commandes est activé
+  const config = require("../config").default;
+  
+  if (config.autoRegisterCommands && client.user && client.token) {
+    Console.box("^y", "Commandes", [
+      { type: "info", content: `Enregistrement automatique des commandes en cours...` }
+    ]);
+    
     const rest = new REST({ version: "10" }).setToken(client.token);
     try {
       await rest.put(Routes.applicationCommands(client.user.id), {
         body: commands,
       });
+      
+      Console.box("^g", "Commandes", [
+        { type: "success", content: `${commands.length} commandes enregistrées avec succès!` }
+      ]);
     } catch (error) {
       Console.box("^r", "Discord API", [
         { type: "error", content: `Erreur lors de la synchronisation des commandes: ${error}` }
       ]);
     }
+  } else if (!config.autoRegisterCommands) {
+    Console.box("^y", "Commandes", [
+      { type: "info", content: `Enregistrement automatique des commandes désactivé` },
+      { type: "info", content: `Utilisez 'npm run register-simple' pour enregistrer les commandes` }
+    ]);
   }
 };

@@ -10,12 +10,7 @@ import { handleCommands } from "./handlers/commands";
 import os from "os";
 import { Emojis } from "./constants/emojis";
 import { EmojiUtils } from "./utils/emojiUtils";
-
-declare module "discord.js" {
-  export interface Client {
-    commands: Collection<string, any>;
-  }
-}
+import "./types/discord";
 
 const bot = new Client({
   intents: [

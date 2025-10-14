@@ -1,7 +1,9 @@
 {
   "scripts": {
     "build": "tsc",
-    "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/bot.ts"
+    "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/bot.ts",
+    "register": "node scripts/register-commands.js",
+    "reset-commands": "node scripts/reset-global-commands.js"
   },
   "dependencies": {
     "@discordjs/rest": "^2.5.1",

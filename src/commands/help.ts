@@ -34,7 +34,7 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
         categories["Informations"].push({ name: commandName, description: commandDesc });
       } else if (["debug"].includes(commandName)) {
         categories["Système"].push({ name: commandName, description: commandDesc });
-      } else if (["roll"].includes(commandName)) {
+      } else if (["roll", "emoji", "emojis"].includes(commandName)) {
         categories["Amusement"].push({ name: commandName, description: commandDesc });
       } else if (["help"].includes(commandName)) {
         categories["Utilitaires"].push({ name: commandName, description: commandDesc });

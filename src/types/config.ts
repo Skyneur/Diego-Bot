@@ -10,4 +10,5 @@ export interface Config {
   startupMessage: boolean;
   logChannelId: string;
   color: string;
+  autoRegisterCommands: boolean;
 }

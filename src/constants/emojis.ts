@@ -52,8 +52,8 @@ export const Emojis = {
   CHECK2: new CustomEmoji("1427573111603069020", "check2", false),
   CROSS: new CustomEmoji("1427573095610323005", "cross", false),
   CHECK: new CustomEmoji("1427573083216285767", "check", false),
-  NEW2: new CustomEmoji("1427573066145202267", "new2", false),
   NEW: new CustomEmoji("1427573046499082312", "new", false),
+  NEW2: new CustomEmoji("1427573066145202267", "new2", false),
   
   // Emojis Unicode standards
   ROCKET: "🚀",

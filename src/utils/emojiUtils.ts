@@ -43,8 +43,8 @@ export const EmojiUtils = {
     }
   },
   
-  getNewEmoji: (isNew: boolean, style: "simple" | "fancy" = "simple") => {
+  getNewEmoji: (isNew: boolean) => {
     if (!isNew) return "";
-    return style === "simple" ? Emojis.NEW : Emojis.NEW2;
+    return `${Emojis.NEW}${Emojis.NEW2}`;
   }
 };
