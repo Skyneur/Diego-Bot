@@ -8,6 +8,8 @@ import config from "@src/config";
 import { Console } from "@src/utils/console/namespace";
 import { handleCommands } from "./handlers/commands";
 import os from "os";
+import { Emojis } from "./constants/emojis";
+import { EmojiUtils } from "./utils/emojiUtils";
 
 declare module "discord.js" {
   export interface Client {
@@ -65,17 +67,19 @@ bot.login(process.env.TOKEN).then(async () => {
     try {
       const logChannel = await bot.channels.fetch(config.logChannelId);
       if (logChannel && logChannel.isTextBased()) {
+        const safeNumber = (n: number | undefined) => Math.max(0, n ?? 0);
+
         const startupEmbed = new EmbedBuilder()
-          .setTitle("`🚀` **Bot démarré**")
+          .setTitle(`${Emojis.ROCKET} **Bot démarré**`)
           .setDescription(`*Le bot a démarré avec succès en mode **${config.environment}**.*`)
           .setColor(config.color as ColorResolvable)
           .addFields(
-            { name: "`💻` **Système**", value: `\`${os.type()} ${os.release()}\``, inline: true },
-            { name: "`🕰️` **Démarré à**", value: `\`${new Date().toLocaleString()}\``, inline: true },
-            { name: "`📋` **Version**", value: `\`${config.version}\``, inline: true },
-            { name: "`🔧` **Environnement**", value: `\`${config.environment}\``, inline: true },
-            { name: "`🌐` **Latence**", value: `\`${bot.ws.ping}ms\``, inline: true },
-            { name: "`📂` **Serveurs**", value: `\`${bot.guilds.cache.size}\``, inline: true }
+            { name: `${Emojis.GEAR} **Système**`, value: `\`${os.type()} ${os.release()}\``, inline: true },
+            { name: `${Emojis.CLOCK} **Démarré à**`, value: `\`${new Date().toLocaleString()}\``, inline: true },
+            { name: `${Emojis.NOTEPAD} **Version**`, value: `\`${config.version}\``, inline: true },
+            { name: `${Emojis.WRENCH} **Environnement**`, value: `\`${config.environment}\``, inline: true },
+            { name: `${EmojiUtils.getConnectionEmoji(bot.ws.ping)} **Latence**`, value: `\`${Math.max(0, bot.ws.ping)}ms\``, inline: true },
+            { name: `${Emojis.FOLDER} **Serveurs**`, value: `\`${safeNumber(bot.guilds.cache.size)}\``, inline: true }
           )
           .setTimestamp();
         
