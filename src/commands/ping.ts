@@ -1,6 +1,7 @@
 import { Command } from "@src/handlers/commands";
 import { Client, Message, EmbedBuilder, ColorResolvable, CommandInteraction, version as discordJsVersion } from "discord.js";
 import { _T } from "@src/utils/translator";
+import { getEmoji } from "@src/constants/emojis";
 import config from "@src/config";
 import os from "os";
 
@@ -15,7 +16,7 @@ const command = new Command<[Client, Message | CommandInteraction]>(
     const startTime = Date.now();
     
     const initialEmbed = new EmbedBuilder()
-      .setTitle("`🏓` **Ping en cours...**")
+      .setTitle(`${getEmoji("ROCKET")} **Ping en cours...**`)
       .setDescription("*Calcul de la latence en cours...*")
       .setColor(config.color as ColorResolvable)
       .setTimestamp();
@@ -40,16 +41,16 @@ const command = new Command<[Client, Message | CommandInteraction]>(
     const userCount = client.users.cache.size;
     
     const finalEmbed = new EmbedBuilder()
-      .setTitle("`🏓` **Pong!**")
-      .setDescription(`**Le bot est opérationnel!** 🚀\n\n*Voici les statistiques actuelles:*`)
+      .setTitle(`${getEmoji("ROCKET")} **Pong!**`)
+      .setDescription(`**Le bot est opérationnel!** ${getEmoji("ROCKET")}\n\n*Voici les statistiques actuelles:*`)
       .setColor(config.color as ColorResolvable)
       .addFields(
-        { name: "`📡` **Latence API**", value: `\`${apiLatency}ms\``, inline: true },
-        { name: "`🌐` **Latence WebSocket**", value: `\`${wsLatency}ms\``, inline: true },
-        { name: "`⏱️` **Uptime**", value: `\`${uptime}\``, inline: true },
-        { name: "`🖥️` **Système**", value: `\`${osType}\``, inline: true },
-        { name: "`📊` **Mémoire**", value: `\`${memoryUsedMB}MB / ${memoryTotalMB}MB\``, inline: true },
-        { name: "`🔄` **CPU**", value: `\`${cpuUsage}%\``, inline: true },
+        { name: `${getEmoji("GLOBE")} **Latence API**`, value: `\`${apiLatency}ms\``, inline: true },
+        { name: `${getEmoji("GLOBE")} **Latence WebSocket**`, value: `\`${wsLatency}ms\``, inline: true },
+        { name: `${getEmoji("CLOCK")} **Uptime**`, value: `\`${uptime}\``, inline: true },
+  { name: `${getEmoji('GEAR')} **Système**`, value: `\`${osType}\``, inline: true },
+  { name: `${getEmoji('CHART')} **Mémoire**`, value: `\`${memoryUsedMB}MB / ${memoryTotalMB}MB\``, inline: true },
+        { name: `${getEmoji("GEAR")} **CPU**`, value: `\`${cpuUsage}%\``, inline: true },
         { name: "`🤖` **Discord.js**", value: `\`v${discordJsVersion}\``, inline: true },
         { name: "`📂` **Serveurs**", value: `\`${serverCount}\``, inline: true },
         { name: "`👥` **Utilisateurs**", value: `\`${userCount}\``, inline: true }

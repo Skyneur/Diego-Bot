@@ -1,6 +1,7 @@
 import { Command } from "@src/handlers/commands";
 import { Client, ChatInputCommandInteraction, EmbedBuilder, ColorResolvable, MessageFlags } from "discord.js";
 import config from "@src/config";
+import { getEmoji } from "@src/constants/emojis";
 import { statsManager, GameType } from "@src/utils/stats/playerStats";
 
 const command = new Command<[Client, ChatInputCommandInteraction]>(
@@ -63,7 +64,7 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
     }
     if (membersList.length < 2) {
       const errorEmbed = new EmbedBuilder()
-        .setTitle("`❌` **Erreur**")
+        .setTitle(`${getEmoji('CROSS')} **Erreur**`)
         .setDescription("Vous devez spécifier au moins 2 membres pour former des équipes.")
         .setColor("Red")
         .setTimestamp();
@@ -78,7 +79,7 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
 
     if (teamCount < 2 || teamCount > membersList.length) {
       const errorEmbed = new EmbedBuilder()
-        .setTitle("`❌` **Erreur**")
+        .setTitle(`${getEmoji('CROSS')} **Erreur**`)
         .setDescription(`Le nombre d'équipes doit être compris entre 2 et ${membersList.length}.`)
         .setColor("Red")
         .setTimestamp();

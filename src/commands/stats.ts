@@ -1,6 +1,7 @@
 import { Command } from "@src/handlers/commands";
 import { Client, ChatInputCommandInteraction, EmbedBuilder, ColorResolvable, MessageFlags, User } from "discord.js";
 import { statsManager, GameType } from "@src/utils/stats/playerStats";
+import { getEmoji } from "@src/constants/emojis";
 import config from "@src/config";
 
 const command = new Command<[Client, ChatInputCommandInteraction]>(
@@ -57,7 +58,7 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
               .setColor("Red")
               .addFields({
                 name: "🔒 Restriction",
-                value: "Seuls les administrateurs peuvent modifier les statistiques des autres joueurs.",
+                 value: "Seuls les administrateurs peuvent modifier les statistiques des autres joueurs.",
                 inline: false
               })
               .addFields({
@@ -88,12 +89,12 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
             await interaction.reply({
               embeds: [
                 new EmbedBuilder()
-                  .setTitle("`📊` Statistiques non disponibles")
+                  .setTitle(`${getEmoji('CHART')} Statistiques non disponibles`)
                   .setDescription(`### Aucune donnée trouvée\n*${targetUser.toString()} n'a pas encore de statistiques sur ${gameName}.*`)
                   .setColor(config.color as ColorResolvable)
                   .addFields({
-                    name: "`🎮` Comment commencer ?",
-                    value: "Pour ajouter des statistiques, utilisez les commandes suivantes :\n• `/stats action:Ajouter une victoire jeu:${gameType}`\n• `/stats action:Ajouter une défaite jeu:${gameType}`",
+                    name: `${getEmoji('GAME')} Comment commencer ?`,
+                    value: `Pour ajouter des statistiques, utilisez les commandes suivantes :\n• \/stats action:Ajouter une victoire jeu:${gameType}\n• \/stats action:Ajouter une défaite jeu:${gameType}`,
                     inline: false
                   })
                   .setFooter({ text: "Les statistiques apparaîtront ici dès que des parties seront enregistrées" })
@@ -108,16 +109,16 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
           const winRate = totalGames > 0 ? Math.round((stats.wins / totalGames) * 100) : 0;
           
           const statsEmbed = new EmbedBuilder()
-            .setTitle(`\`📊\` Statistiques ${gameName}`)
+            .setTitle(`${getEmoji("NOTEPAD")} Statistiques ${gameName}`)
             .setDescription(`### Profil de ${targetUser.toString()}\n*Voici les statistiques pour ce joueur sur ${gameName}*`)
             .setColor(config.color as ColorResolvable)
             .setThumbnail(targetUser.displayAvatarURL())
             .addFields(
-              { name: "`🏆` Victoires", value: `**${stats.wins}**`, inline: true },
-              { name: "`❌` Défaites", value: `**${stats.losses}**`, inline: true },
-              { name: "`📈` Ratio V/D", value: `**${winRate}%**`, inline: true },
-              { name: "`⚖️` Score ELO", value: `**${stats.skillRating}**`, inline: true },
-              { name: "`🎮` Parties jouées", value: `**${totalGames}**`, inline: true }
+              { name: `${getEmoji("ROCKET")} Victoires`, value: `**${stats.wins}**`, inline: true },
+              { name: `${getEmoji("CROSS")} Défaites`, value: `**${stats.losses}**`, inline: true },
+              { name: `${getEmoji("GLOBE")} Ratio V/D`, value: `**${winRate}%**`, inline: true },
+              { name: `${getEmoji("GEAR")} Score ELO`, value: `**${stats.skillRating}**`, inline: true },
+              { name: `${getEmoji("ROCKET")} Parties jouées`, value: `**${totalGames}**`, inline: true }
             )
             .setFooter({ text: `Joueur ID: ${targetUser.id} • Statistiques à jour` })
             .setTimestamp();
@@ -132,7 +133,7 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
           await interaction.reply({
             embeds: [
               new EmbedBuilder()
-                .setTitle("`✅` Victoire enregistrée")
+                .setTitle(`${getEmoji('CHECK2')} Victoire enregistrée`)
                 .setDescription(`### Félicitations ${targetUser.toString()} !\n*Une victoire a été ajoutée à votre palmarès sur ${gameName}.*`)
                 .setColor("Green")
                 .setTimestamp()
@@ -152,7 +153,7 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
           await interaction.reply({
             embeds: [
               new EmbedBuilder()
-                .setTitle("`📝` Défaite enregistrée")
+                .setTitle(`${getEmoji('NOTEPAD')} Défaite enregistrée`)
                 .setDescription(`### Pas de chance ${targetUser.toString()} !\n*Une défaite a été ajoutée à votre historique sur ${gameName}.*`)
                 .setColor("Red")
                 .setTimestamp()
@@ -259,7 +260,7 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
         await interaction.reply({
           embeds: [
             new EmbedBuilder()
-              .setTitle("❌ Erreur")
+              .setTitle(`${getEmoji('CROSS2')} Erreur`)
               .setDescription("### Une erreur est survenue\n*Le système a rencontré un problème lors de l'exécution de cette commande.*")
               .setColor("Red")
               .addFields({ 

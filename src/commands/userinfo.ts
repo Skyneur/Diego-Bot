@@ -2,6 +2,7 @@ import { Command } from "@src/handlers/commands";
 import { Client, CommandInteraction, ChatInputCommandInteraction, EmbedBuilder, ColorResolvable, GuildMember, User } from "discord.js";
 import { _T } from "@src/utils/translator";
 import config from "@src/config";
+import { getEmoji } from "@src/constants/emojis";
 
 const command = new Command<[Client, ChatInputCommandInteraction]>(
   "slash",
@@ -31,18 +32,18 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
     const status = getStatusString(targetMember);
     const nickname = targetMember?.nickname || "Aucun";
     const embed = new EmbedBuilder()
-      .setTitle(`\`👤\` **Informations sur ${targetUser.tag}**`)
+      .setTitle(`${getEmoji('PERSON')} **Informations sur ${targetUser.tag}**`)
       .setDescription(`*Voici les informations détaillées sur l'utilisateur.*`)
       .setThumbnail(targetUser.displayAvatarURL({ size: 256 }))
       .setColor(config.color as ColorResolvable)
       .addFields(
-        { name: '\`🆔\` **ID**', value: `\`${targetUser.id}\``, inline: true },
-        { name: '\`📛\` **Pseudo**', value: `\`${nickname}\``, inline: true },
-        { name: '\`🤖\` **Bot**', value: `\`${isBot}\``, inline: true },
-        { name: '\`📆\` **Compte créé le**', value: `\`${accountCreated}\` (${memberAge})`, inline: true },
-        { name: '\`🚪\` **Rejoint le serveur le**', value: `\`${joinDate}\` (${serverAge})`, inline: true },
-        { name: '\`🎭\` **Statut**', value: `\`${status}\``, inline: true },
-        { name: '\`🏅\` **Badges**', value: `\`${userFlags}\``, inline: false }
+        { name: `${getEmoji('CROWN')} **ID**`, value: `\`${targetUser.id}\``, inline: true },
+        { name: `${getEmoji('PIN')} **Pseudo**`, value: `\`${nickname}\``, inline: true },
+        { name: `${getEmoji('ROBOT')} **Bot**`, value: `\`${isBot}\``, inline: true },
+        { name: `${getEmoji('CALENDAR')} **Compte créé le**`, value: `\`${accountCreated}\` (${memberAge})`, inline: true },
+        { name: `${getEmoji('TRASH')} **Rejoint le serveur le**`, value: `\`${joinDate}\` (${serverAge})`, inline: true },
+        { name: `${getEmoji('THEATER')} **Statut**`, value: `\`${status}\``, inline: true },
+        { name: `${getEmoji('MEDAL')} **Badges**`, value: `\`${userFlags}\``, inline: false }
       )
       .setFooter({ text: `Demandé par ${interaction.user.tag}` })
       .setTimestamp();

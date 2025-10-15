@@ -1,6 +1,7 @@
 import { Command } from "@src/handlers/commands";
 import { Client, ChatInputCommandInteraction, EmbedBuilder, ColorResolvable } from "discord.js";
 import { _T } from "@src/utils/translator";
+import { getEmoji } from "@src/constants/emojis";
 import config from "@src/config";
 
 const command = new Command<[Client, ChatInputCommandInteraction]>(
@@ -70,12 +71,12 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
 );
 function getCategoryIcon(category: string): string {
   switch (category) {
-    case "Informations": return "ℹ️";
-    case "Utilitaires": return "🔧";
-    case "Amusement": return "🎮";
-    case "Système": return "⚙️";
-    case "Autres": return "📋";
-    default: return "📌";
+    case 'Informations': return getEmoji('GLOBE');
+    case 'Utilitaires': return getEmoji('GEAR');
+    case 'Amusement': return '🎮';
+    case 'Système': return getEmoji('GEAR');
+    case 'Autres': return getEmoji('NOTEPAD');
+    default: return '📌';
   }
 }
 

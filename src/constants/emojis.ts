@@ -48,8 +48,8 @@ export const Emojis = {
   
   // Indicateurs
   CROW: new CustomEmoji("1427573149217853521", "crow", false),
-  CROSS2: new CustomEmoji("1427573124865462312", "cross2", false),
-  CHECK2: new CustomEmoji("1427573111603069020", "check2", false),
+  CROSS2: new CustomEmoji("1427573124865462312", "cross2", false), // Checkbox with cross
+  CHECK2: new CustomEmoji("1427573111603069020", "check2", false), // Checkbox with check
   CROSS: new CustomEmoji("1427573095610323005", "cross", false),
   CHECK: new CustomEmoji("1427573083216285767", "check", false),
   NEW: new CustomEmoji("1427573046499082312", "new", false),
@@ -63,6 +63,26 @@ export const Emojis = {
   NOTEPAD: "📋",
   WRENCH: "🔧",
   FOLDER: "📂"
+  ,
+  // Additional unicode shortcuts used across commands
+  CHART: "📊",
+  GAME: "🎮",
+  RATING_GOOD: "🟢",
+  RATING_MEDIUM: "🟠",
+  RATING_BAD: "🔴",
+  TRASH: "🗑️",
+  LOCK: "🔒",
+  PODIUM: "🔱",
+  FILE: "📁",
+  MAGNIFIER: "🔍",
+  THEATER: "🎭",
+  MEDAL: "🏆"
+  ,
+  CROWN: "👑",
+  PERSON: "🧑",
+  ROBOT: "🤖",
+  CALENDAR: "📆",
+  PIN: "📌"
 };
 
 export function getEmoji(name: keyof typeof Emojis, fallback: string = ""): string {

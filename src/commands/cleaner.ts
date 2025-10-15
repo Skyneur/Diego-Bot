@@ -1,6 +1,7 @@
 import { Command } from "@src/handlers/commands";
 import { Client, ChatInputCommandInteraction, EmbedBuilder, ColorResolvable, TextChannel, Collection, Message, ChannelType, MessageFlags } from "discord.js";
 import { _T } from "@src/utils/translator";
+import { getEmoji } from "@src/constants/emojis";
 import config from "@src/config";
 
 const command = new Command<[Client, ChatInputCommandInteraction]>(
@@ -9,140 +10,79 @@ const command = new Command<[Client, ChatInputCommandInteraction]>(
   "Supprimer des messages d'un canal",
   null,
   [
-    {
-      type: "Number",
-      name: "nombre",
-      description: "Nombre de messages à supprimer (1-100)",
-      required: false,
-      choices: []
-    },
-    {
-      type: "User",
-      name: "utilisateur",
-      description: "Utilisateur dont les messages doivent être supprimés",
-      required: false,
-      choices: []
-    },
-    {
-      type: "Channel",
-      name: "canal",
-      description: "Canal où supprimer les messages (par défaut: canal actuel)",
-      required: false,
-      choices: []
-    }
+    { type: "Number", name: "nombre", description: "Nombre de messages à supprimer (1-100)", required: false, choices: [] },
+    { type: "User", name: "utilisateur", description: "Utilisateur dont les messages doivent être supprimés", required: false, choices: [] },
+    { type: "Channel", name: "canal", description: "Canal où supprimer les messages (par défaut: canal actuel)", required: false, choices: [] }
   ],
   async (client, interaction) => {
-    if (!interaction.memberPermissions?.has("ManageMessages")) {
+    if (!interaction.memberPermissions?.has('ManageMessages')) {
       const errorEmbed = new EmbedBuilder()
-        .setTitle("`❌` **Erreur de permission**")
-        .setDescription("Vous devez avoir la permission de gérer les messages pour utiliser cette commande.")
-        .setColor("Red")
+        .setTitle(`${getEmoji('CROSS')} Erreur de permission`)
+        .setDescription('Vous devez avoir la permission de gérer les messages pour utiliser cette commande.')
+        .setColor('Red')
         .setTimestamp();
-        
-      await interaction.reply({
-        embeds: [errorEmbed],
-        flags: MessageFlags.Ephemeral
-      });
+
+      await interaction.reply({ embeds: [errorEmbed], flags: MessageFlags.Ephemeral });
       return;
     }
-    
-    const amount = interaction.options.getNumber("nombre") || 10;
-    const targetUser = interaction.options.getUser("utilisateur");
-    const targetChannel = interaction.options.getChannel("canal") || interaction.channel;
-    
+
+    const amount = interaction.options.getNumber('nombre') || 10;
+    const targetUser = interaction.options.getUser('utilisateur');
+    const targetChannel = (interaction.options.getChannel('canal') || interaction.channel) as TextChannel | null;
+
     const messageCount = Math.min(Math.max(Math.floor(amount), 1), 100);
     if (!targetChannel || targetChannel.type !== ChannelType.GuildText) {
       const errorEmbed = new EmbedBuilder()
-        .setTitle("`❌` **Canal non valide**")
-        .setDescription("Le canal spécifié n'est pas un canal de texte valide.")
-        .setColor("Red")
+        .setTitle(`${getEmoji('CROSS')} Canal non valide`)
+        .setDescription('Le canal spécifié n\'est pas un canal de texte valide.')
+        .setColor('Red')
         .setTimestamp();
-        
-      await interaction.reply({
-        embeds: [errorEmbed],
-        flags: MessageFlags.Ephemeral
-      });
+
+      await interaction.reply({ embeds: [errorEmbed], flags: MessageFlags.Ephemeral });
       return;
     }
 
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-    
+
     try {
       const textChannel = targetChannel as TextChannel;
-      
-      const startEmbed = new EmbedBuilder()
-        .setTitle("`🧹` **Nettoyage des messages**")
-        .setDescription(`*Suppression en cours dans ${textChannel}...*`)
-        .setColor(config.color as ColorResolvable)
-        .addFields({
-          name: "`⚙️` **Paramètres**",
-          value: `Canal: ${textChannel}\nNombre: \`${messageCount}\`${targetUser ? `\nUtilisateur: ${targetUser}` : ''}`,
-          inline: false
-        })
-        .setTimestamp();
-      
-      await interaction.editReply({ embeds: [startEmbed] });
-      
-      let fetchedMessages: Collection<string, Message<true>>;
-      
-      fetchedMessages = await textChannel.messages.fetch({ limit: 100 });
+      const fetchedMessages: Collection<string, Message<true>> = await textChannel.messages.fetch({ limit: 100 });
 
       let messagesToDelete: Message<true>[] = [...fetchedMessages.values()];
-      
-      if (targetUser) {
-        messagesToDelete = messagesToDelete.filter(msg => msg.author.id === targetUser.id);
-      }
-      
+      if (targetUser) messagesToDelete = messagesToDelete.filter(m => m.author.id === targetUser.id);
       messagesToDelete = messagesToDelete.slice(0, messageCount);
-      
-      const deleteCount = messagesToDelete.length;
-      
-      if (deleteCount === 0) {
+
+      if (messagesToDelete.length === 0) {
         const infoEmbed = new EmbedBuilder()
-          .setTitle("`ℹ️` **Aucun message trouvé**")
-          .setDescription(targetUser 
-            ? `Aucun message trouvé pour l'utilisateur ${targetUser.tag} dans ce canal.`
-            : "Aucun message trouvé à supprimer.")
+          .setTitle(`${getEmoji('GLOBE')} Aucun message trouvé`)
+          .setDescription(targetUser ? `Aucun message trouvé pour l'utilisateur ${targetUser.tag} dans ce canal.` : 'Aucun message trouvé à supprimer.')
           .setColor(config.color as ColorResolvable)
           .setTimestamp();
-          
-        await interaction.editReply({
-          embeds: [infoEmbed]
-        });
+        await interaction.editReply({ embeds: [infoEmbed] });
         return;
       }
-      
-      if (deleteCount > 1 && messagesToDelete.every(msg => Date.now() - msg.createdTimestamp < 1209600000)) {
-        await textChannel.bulkDelete(messagesToDelete);
+
+      if (messagesToDelete.length > 1 && messagesToDelete.every(m => Date.now() - m.createdTimestamp < 1209600000)) {
+        await textChannel.bulkDelete(messagesToDelete as any);
       } else {
-        for (const message of messagesToDelete) {
-          await message.delete().catch(console.error);
-        }
+        for (const m of messagesToDelete) await m.delete().catch(console.error);
       }
-      
+
       const resultEmbed = new EmbedBuilder()
-        .setTitle("`✅` **Nettoyage terminé**")
-        .setDescription(`*${deleteCount} messages ont été supprimés dans ${textChannel}*`)
+        .setTitle(`${getEmoji('CHECK2')} Nettoyage terminé`)
+        .setDescription(`*${messagesToDelete.length} messages ont été supprimés dans ${textChannel}*`)
         .setColor(config.color as ColorResolvable)
         .setTimestamp();
-      
-      if (targetUser) {
-        resultEmbed.addFields({
-          name: "`👤` **Messages supprimés de**",
-          value: `${targetUser.tag} (${targetUser.id})`,
-          inline: false
-        });
-      }
-      
+
+      if (targetUser) resultEmbed.addFields({ name: `${getEmoji('CROW')} **Messages supprimés de**`, value: `${targetUser.tag} (${targetUser.id})`, inline: false });
+
       await interaction.editReply({ embeds: [resultEmbed] });
-      
-    } catch (error: any) {
+    } catch (err: any) {
       const errorEmbed = new EmbedBuilder()
-        .setTitle("`❌` **Erreur**")
-        .setDescription(`*Une erreur est survenue lors de la suppression des messages:*\n\`\`\`\n${error?.message || "Erreur inconnue"}\n\`\`\``)
-        .setColor("Red")
+        .setTitle(`${getEmoji('CROSS2')} Erreur`)
+        .setDescription('*Une erreur est survenue lors de la suppression des messages:*' + (err?.message || 'Erreur inconnue'))
+        .setColor('Red')
         .setTimestamp();
-      
       await interaction.editReply({ embeds: [errorEmbed] });
     }
   }

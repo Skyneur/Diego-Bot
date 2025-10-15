@@ -1,7 +1,7 @@
 import { Client, CommandInteraction, EmbedBuilder, ColorResolvable } from "discord.js";
 import { Command } from "@src/handlers/commands";
 import { _T } from "@src/utils/translator";
-import { Emojis } from "@src/constants/emojis";
+import { Emojis, getEmoji } from "@src/constants/emojis";
 import { EmojiUtils } from "@src/utils/emojiUtils";
 import os from "os";
 import config from "@src/config";
@@ -28,16 +28,16 @@ const command = new Command<[Client, CommandInteraction]>(
     const connectionEmoji = EmojiUtils.getConnectionEmoji(client.ws.ping);
     
     const embed = new EmbedBuilder()
-      .setTitle(`${Emojis.ROCKET} **État du bot**`)
+      .setTitle(`${getEmoji('ROCKET')} **État du bot**`)
       .setColor(config.color as ColorResolvable)
       .addFields(
         { name: `${statusEmoji} **Statut**`, value: `\`${status}\``, inline: true },
         { name: `${connectionEmoji} **Latence**`, value: `\`${Math.max(0, client.ws.ping)}ms\``, inline: true },
-        { name: `${Emojis.FOLDER} **Serveurs**`, value: `\`${client.guilds.cache.size}\``, inline: true },
+        { name: `${getEmoji('FOLDER')} **Serveurs**`, value: `\`${client.guilds.cache.size}\``, inline: true },
         
-        { name: `${Emojis.CLOCK} **Uptime**`, value: `\`${uptimeStr}\``, inline: true },
-        { name: `${Emojis.GEAR} **Mémoire**`, value: `\`${memoryUsed} MB\``, inline: true },
-        { name: `${Emojis.NOTEPAD} **Version**`, value: `\`${config.version}\``, inline: true }
+        { name: `${getEmoji('CLOCK')} **Uptime**`, value: `\`${uptimeStr}\``, inline: true },
+        { name: `${getEmoji('GEAR')} **Mémoire**`, value: `\`${memoryUsed} MB\``, inline: true },
+        { name: `${getEmoji('NOTEPAD')} **Version**`, value: `\`${config.version}\``, inline: true }
       )
       .setFooter({ text: `Environnement: ${config.environment}` })
       .setTimestamp();
