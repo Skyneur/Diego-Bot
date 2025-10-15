@@ -13,181 +13,120 @@ Un template moderne et modulaire pour développer des bots Discord en TypeScript
 - 🌐 **Support multilingue** - Système de traduction intégré et configurable
 - 🎨 **Console stylisée** - Système de logs colorés et formatés avec tableaux et encadrés
 - ⚡ **Hot reload** - Configuration prête pour le développement avec rechargement automatique
-- 🔧 **TypeScript** - Template entièrement typé avec IntelliSense complet
-- 📦 **Handlers automatiques** - Système de chargement automatique des commandes et événements
-- 🛡️ **Gestion des permissions** - Support complet et prêt à l'emploi des permissions Discord
-- 🎯 **Multi-types de commandes** - Support natif des commandes préfixées, slash et menus contextuels
-- 🚀 **Prêt à l'emploi** - Configuration minimale requise pour démarrer votre projet
+<!-- README adapté pour Diego-Bot -->
+# 🚀 Diego-Bot
 
-## 🚀 Installation
+Diego-Bot est un bot Discord écrit en TypeScript. Il fournit des commandes utilitaires, un système de statistiques joueur (persisté dans `src/data/playerStats.json`) et expose une API HTTP intégrée pour permettre à un site externe de lire ces statistiques.
 
-### Prérequis
+Ce projet est basé sur une template initiale fournie par [Soren](https://github.com/Soren-git) — un grand merci pour la base solide.
 
-- [Node.js](https://nodejs.org/) (v16 ou plus récent)
-- [pnpm](https://pnpm.io/) (recommandé) ou npm
-- Un token de bot Discord
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Discord.js](https://img.shields.io/badge/Discord.js-5865F2?style=for-the-badge&logo=discord&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
+![MIT License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)
 
-### Configuration
+## ✨ Points clés du projet
 
-1. **Clonez le repository**
-   ```bash
-   git clone https://github.com/Soren-git/discord-bot-typescript.git
-   cd discord-bot-typescript
-   ```
+- Architecture modulaire (commands / events / handlers)
+- Système de stats joueur (lecture/écriture dans `src/data/playerStats.json` via `statsManager`)
+- API HTTP intégrée (exposée par le bot quand il démarre)
+- Multilingue (fichiers `src/locales`)
+- Hot-reload en développement via `ts-node-dev`
 
-2. **Installez les dépendances**
-   ```bash
-   pnpm install
-   # ou
-   npm install
-   ```
+## Installation rapide
 
-3. **Configurez l'environnement**
-   ```bash
-   cp .env.example .env
-   ```
-   
-   Éditez le fichier `.env` et ajoutez votre token :
-   ```env
-   TOKEN=votre_token_discord_ici
-   ```
+Prérequis : Node.js (v16+), npm ou pnpm, et un token Discord.
 
-4. **Configurez le bot**
-   
-   Modifiez `src/config.ts` selon vos besoins :
-   ```typescript
-   const config: Config = {
-     language: "en",        // Langue du bot
-     prefix: "$",           // Préfixe des commandes
-     status: "dnd",         // Statut du bot
-     activities: [          // Activités du bot
-       {
-         name: ".gg/zproject",
-         type: ActivityType.Custom,
-       },
-     ],
-   };
-   ```
-
-## 🎮 Développement
-
-### Mode développement
+1. Installer les dépendances :
 
 ```bash
-pnpm dev
+npm install
 # ou
+pnpm install
+```
+
+2. Copier et remplir le fichier d'environnement :
+
+```bash
+cp .env.example .env
+# ajouter TOKEN=... dans .env
+```
+
+## Scripts utiles
+
+| Script | Description |
+|---|---|
+| `npm run dev` | Démarrage en développement (hot reload) |
+| `npm run api` | (optionnel) démarre seulement l'API (si tu veux la lancer séparément) |
+| `npm run build` | Compile le projet |
+| `node dist/bot.js` | Démarrer la version compilée |
+
+> Remarque : l'API est désormais démarrée automatiquement lorsque le bot démarre (`startApi()` est appelé depuis `src/bot.ts`).
+
+## API intégrée
+
+L'API est exposée par défaut sur le port 3000 (modifiable via la variable d'environnement `PORT`). Endpoints principaux :
+
+- GET /api/player-stats — renvoie toutes les statistiques (map id -> objet player)
+- GET /api/player-stats/:id — renvoie les stats d'un joueur
+
+Exemples :
+
+```bash
+curl http://localhost:3000/api/player-stats
+curl http://localhost:3000/api/player-stats/1126528170770837594
+```
+
+Notes importantes :
+- Le bot utilise `statsManager` en mémoire et persiste sur disque (`src/data/playerStats.json`). Si le bot et l'API sont lancés dans le même process (configuration par défaut), les mises à jour effectuées par le bot sont immédiatement visibles via l'API.
+- Si tu veux lancer le bot et l'API dans des processus séparés, considère une approche de synchronisation (DB, webhook ou reload du fichier) pour éviter les incohérences.
+
+## Configuration
+
+- `TOKEN` dans `.env` : token du bot Discord
+- `PORT` (optionnel) : port pour l'API HTTP (défaut 3000)
+
+Possibilité supplémentaire : `config.ts` contient d'autres options (startup message, channel de logs, activités, etc.).
+
+## Développement
+
+Démarrer en dev (bot + API) :
+
+```bash
 npm run dev
 ```
 
-### Build et production
+Compiler :
 
 ```bash
-# Compilation TypeScript
-pnpm build
-# ou
 npm run build
-
-# Démarrage en production
-node dist/bot.js
 ```
 
-### Structure de développement
+### Tests rapides
 
-Le template est conçu pour être facilement extensible. Ajoutez simplement vos fichiers dans les dossiers appropriés et ils seront automatiquement chargés !
+Après démarrage en dev, tester que l'API renvoie les stats :
 
-## 📁 Structure du projet
-
-```
-src/
-├── commands/           # Commandes du bot
-│   └── ping.ts        # Exemple de commande
-├── events/            # Événements Discord
-│   └── message-create.ts
-├── handlers/          # Gestionnaires de commandes et événements
-│   ├── commands.ts
-│   └── events.ts
-├── locales/           # Fichiers de traduction
-│   └── en.json
-├── types/             # Définitions TypeScript
-├── utils/             # Utilitaires
-│   ├── console/       # Système de console stylisée
-│   └── translator.ts  # Système de traduction
-├── constants/         # Constantes
-├── config.ts          # Configuration du bot
-└── bot.ts            # Point d'entrée
+```bash
+curl http://localhost:3000/api/player-stats
 ```
 
-## 🛠️ Ajouter des commandes
+## Sécurité & production
 
-### Commande basique (avec préfixe)
+- Pour la production, pense à protéger l'API (token, IP whitelist, reverse proxy) si elle contient des données sensibles.
+- Si tu as besoin de haute disponibilité ou de multiples instances du bot, migre les stats vers une base de données (SQLite / Postgres / MongoDB) plutôt que d'utiliser un fichier JSON partagé.
 
-Créez un fichier dans `src/commands/` :
+## Crédits
 
-```typescript
-import { Command } from "@src/handlers/commands";
-import { Client, Message } from "discord.js";
+- Basé sur une template initiale par [Soren](https://github.com/Soren-git)
+- Adapté et développé par [Skyneur](https://github.com/Skyneur)
 
-const command = new Command<[Client, Message, string[]]>(
-  "basic",
-  "hello",
-  "Say hello to the user",
-  null,
-  [],
-  async (client, message, args) => {
-    const user = args[0] ? `<@${args[0]}>` : message.author.toString();
-    message.reply(`Hello ${user}! 👋`);
-  }
-);
+## Licence
 
-export default command;
-```
+Ce projet est sous licence MIT — voir `LICENSE`.
 
-### Commande Slash
+---
 
-```typescript
-import { Command } from "@src/handlers/commands";
-import { Client, CommandInteraction } from "discord.js";
-
-const command = new Command<[Client, CommandInteraction]>(
-  "slash",
-  "greet",
-  "Greet a user",
-  null,
-  [
-    {
-      type: "User",
-      name: "user",
-      description: "User to greet",
-      required: true,
-      choices: []
-    }
-  ],
-  async (client, interaction) => {
-    const user = interaction.options.getUser("user");
-    await interaction.reply(`Hello ${user}! 👋`);
-  }
-);
-
-export default command;
-```
-
-### Menu contextuel
-
-```typescript
-import { Command } from "@src/handlers/commands";
-import { Client, ContextMenuCommandInteraction, ContextMenuCommandType } from "discord.js";
-
-const command = new Command<[Client, ContextMenuCommandInteraction]>(
-  "context",
-  "User Info",
-  "Get user information",
-  null,
-  [],
-  async (client, interaction) => {
-    const user = interaction.targetUser;
-    await interaction.reply(`User: ${user.tag}\nID: ${user.id}`);
-  },
-  ContextMenuCommandType.User
+Si tu veux que j'ajoute une section détaillée pour le déploiement (PM2 / Docker / CI), ou que j'ajoute un badge CI / couverture, dis-moi ce que tu veux et je l'ajoute.
 );
 
 export default command;
@@ -341,4 +280,4 @@ Si ce template vous a aidé à créer votre bot Discord, n'hésitez pas à :
 
 ---
 
-**Créé avec ❤️ par [Soren](https://github.com/Soren-git) | Template Discord Bot TypeScript**
+**Créé avec ❤️ par [Skyneur](https://github.com/Skyneur) | Discord Bot TypeScript**

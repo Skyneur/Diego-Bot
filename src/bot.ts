@@ -11,6 +11,7 @@ import os from "os";
 import { Emojis } from "./constants/emojis";
 import { EmojiUtils } from "./utils/emojiUtils";
 import "./types/discord";
+import { startApi } from './api';
 
 const bot = new Client({
   intents: [
@@ -57,6 +58,18 @@ bot.login(process.env.TOKEN).then(async () => {
     activities: config.activities,
     status: config.status,
   });
+
+  // Start integrated API so it shares the same statsManager in-memory
+  try {
+    await startApi();
+    Console.box("^g", "API", [
+      { type: "success", content: "API démarrée et intégrée au bot" }
+    ]);
+  } catch (err) {
+    Console.box("^r", "API", [
+      { type: "error", content: `Erreur lors du démarrage de l'API: ${err}` }
+    ]);
+  }
   
   if (config.startupMessage && config.logChannelId) {
     try {
